@@ -186,9 +186,13 @@ deny = [
   "~/.fa/secrets.env",
   "**/.env",
   "**/.env.*",
+  "**/credentials*",
   "**/*.pem",
   "**/*.key",
-  "**/.git/**",                   # never touch .git directly
+  "~/.ssh/**",
+  "~/.aws/**",
+  "~/.gnupg/**",
+  "**/.git/**",                   # extra: never touch .git directly
 ]
 ```
 
