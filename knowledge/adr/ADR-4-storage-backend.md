@@ -189,17 +189,18 @@ chunks(
   the file (UTF-8 default).
 - Schema-version bumps from 1 → 2; the migration in
   `migrations/0002_provenance_columns.sql` is `ALTER TABLE
-  chunks ADD COLUMN ...` (six statements) plus a backfill on
-  `fa reindex`.
+  chunks ADD COLUMN ...` (seven statements: `parent_title`,
+  `breadcrumb`, `line_start`, `line_end`, `byte_start`,
+  `byte_end`, `topic`) plus a backfill on `fa reindex`.
 - This amendment does **not** add `provenance` / `rationale`
   tables. Those are extraction-layer artefacts and remain
   deferred to a v0.2 ADR (Variant D in ADR-3 amendment slot).
 
 **Consequence.** First chunker implementation PR (`src/fa/chunker/`)
-must populate all six new columns, even if v0.1 retrieval ignores
-`parent_title` / `breadcrumb` / `byte_*` / `topic`. Otherwise
-the columns are populated lazily on `fa reindex`, defeating the
-"no full reindex on v0.2 upgrade" property.
+must populate all seven new columns, even if v0.1 retrieval ignores
+`parent_title` / `breadcrumb` / `line_start` / `line_end` / `byte_*` /
+`topic`. Otherwise the columns are populated lazily on `fa reindex`,
+defeating the "no full reindex on v0.2 upgrade" property.
 
 ## References
 
