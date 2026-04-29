@@ -137,11 +137,79 @@ index, with the following concrete shape:
     to a project-local `.fa/` directory instead. v0.1 keeps it in
     `$HOME` to avoid bloating user repos.
 
+## Amendments
+
+### Amendment 2026-04-29 — chunks schema extension for provenance / forward-compat
+
+**Source.** Cross-reference review
+[`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
+§6.2 (Gap-5) and §10 R-5. SLIDERS-style structured extraction
+(potential v0.2 Variant D, see ADR-3) needs per-chunk provenance.
+Adding the columns now is **additive and avoids a full reindex**
+when extraction layer lands. Independently, the `chunks` table
+in v0.1 was missing `line_start` / `line_end`, which the ADR-5
+`Chunk` dataclass already emits — that internal inconsistency
+is fixed by the same migration.
+
+**Decision.** The `chunks` table for v0.1 gains the following
+columns:
+
+```text
+chunks(
+  id INTEGER PK,
+  path TEXT,
+  anchor TEXT,
+  parent_title TEXT,            -- frontmatter title / first H1 / filename
+  breadcrumb TEXT,              -- JSON array of section headings, "[]" if none
+  lang TEXT,
+  body TEXT,
+  line_start INTEGER,           -- 1-based, inclusive (mirrors Chunk dataclass)
+  line_end INTEGER,             -- 1-based, inclusive
+  byte_start INTEGER,           -- 0-based, inclusive
+  byte_end INTEGER,             -- 0-based, exclusive (Pythonic slice)
+  topic TEXT,                   -- nullable; SLIDERS-style amortization key
+  mtime REAL,
+  sha256 TEXT
+)
+```
+
+`chunks_fts` and `meta` are unchanged.
+
+**Notes.**
+
+- `breadcrumb` is stored as a JSON-encoded array (`["README",
+  "Setup"]`) rather than a comma-joined string to keep it parseable
+  even when section titles contain commas.
+- `topic` defaults to `NULL`. v0.1 ignores it; v0.2 extraction
+  layer reads it from frontmatter (see frontmatter `topic:` field
+  amendment in [`knowledge/README.md`](../README.md)).
+- `byte_start` / `byte_end` reference the **canonical on-disk
+  bytes** of the source file, not the `body` string. The chunker
+  is responsible for emitting them in the encoding used to read
+  the file (UTF-8 default).
+- Schema-version bumps from 1 → 2; the migration in
+  `migrations/0002_provenance_columns.sql` is `ALTER TABLE
+  chunks ADD COLUMN ...` (six statements) plus a backfill on
+  `fa reindex`.
+- This amendment does **not** add `provenance` / `rationale`
+  tables. Those are extraction-layer artefacts and remain
+  deferred to a v0.2 ADR (Variant D in ADR-3 amendment slot).
+
+**Consequence.** First chunker implementation PR (`src/fa/chunker/`)
+must populate all six new columns, even if v0.1 retrieval ignores
+`parent_title` / `breadcrumb` / `byte_*` / `topic`. Otherwise
+the columns are populated lazily on `fa reindex`, defeating the
+"no full reindex on v0.2 upgrade" property.
+
 ## References
 
 - [ADR-1](./ADR-1-v01-use-case-scope.md) — v0.1 scope.
 - [ADR-3](./ADR-3-memory-architecture-variant.md) — Variant A
   read-side: grep → BM25 → reserved vector slot.
+- [ADR-5](./ADR-5-chunker-tool.md) — chunker emits the
+  schema-aligned `Chunk` dataclass.
 - [`research/memory-architecture-design-2026-04-26.md`](../research/memory-architecture-design-2026-04-26.md) §3 (design space, ось A — filesystem-canonical), §4 (Variant A read-side).
 - [`research/llm-wiki-community-batch-2.md`](../research/llm-wiki-community-batch-2.md) §3.2 (llm-wiki-kit's "ripgrep + lunr/BM25" pattern).
+- [`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md) §6.2 / §10 R-5 — rationale for the 2026-04-29 amendment.
+- [`research/sliders-structured-reasoning-2026-04.md`](../research/sliders-structured-reasoning-2026-04.md) §3.1 / §3.3 — provenance-fields rationale.
 - SQLite FTS5 documentation: `https://www.sqlite.org/fts5.html`.

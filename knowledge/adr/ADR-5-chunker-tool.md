@@ -178,11 +178,98 @@ must not change the interface.
     deferred to implementation time — defaults are good enough
     until then.
 
+## Amendments
+
+### Amendment 2026-04-29 — Chunk dataclass extension for doc-level metadata
+
+**Source.** Cross-reference review
+[`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
+§7.2 (Gap-6) and §10 R-5. SLIDERS contextualized chunking
+(`m_G` / `m_L` per-document metadata, see SLIDERS §3.1) needs
+the chunker to emit doc-level title and section breadcrumb on
+each chunk. The current `Chunk` dataclass exposes only
+`anchor` (last heading slug) and `path`. Adding
+`parent_title` / `breadcrumb` / `byte_start` / `byte_end` now
+is **additive** — the existing fields stay; the `Chunker`
+Protocol signature is unchanged; downstream consumers that
+ignore the new fields continue to work.
+
+**Decision.** The `Chunk` dataclass for v0.1 gains five fields
+(four mandatory + one optional):
+
+```python
+@dataclass(frozen=True)
+class Chunk:
+    path: str
+    anchor: str
+    parent_title: str            # H1 / frontmatter title / filename
+    breadcrumb: tuple[str, ...]  # section-heading path; () for code or single-chunk files
+    lang: str
+    body: str
+    line_start: int
+    line_end: int
+    byte_start: int              # 0-based, inclusive
+    byte_end: int                # 0-based, exclusive
+    topic: str | None = None     # frontmatter `topic:`; None if absent
+```
+
+**Per-extension semantics.**
+
+- **Markdown / plain text** — `parent_title` is the frontmatter
+  `title:` if present, else the first H1 (slugged is the
+  `anchor`, raw text is `parent_title`), else the filename
+  stem. `breadcrumb` is the tuple of ancestor headings up to
+  but not including the chunk's own anchor (e.g. for `# README
+  → ## Setup → ### Linux` chunk, breadcrumb is `("README",
+  "Setup")`).
+- **Source code** — `parent_title` is the filename (basename,
+  no path). `breadcrumb` is `()` (PowerShell `#region` markers
+  are not breadcrumb-bearing in v0.1; they only drive splitting
+  per ADR §Decision step 2).
+- **Config files** — `parent_title` is the filename;
+  `breadcrumb` is `()`.
+- **Catch-all** — same as config files.
+
+**`byte_start` / `byte_end`** reference the canonical on-disk
+file in its declared encoding (UTF-8 default). For Markdown
+chunks the bytes cover the heading line through the last byte
+of the chunk's body; for symbol chunks, the symbol's full
+extent including any leading docstring or decorator block
+captured by ctags. The byte offsets are advisory for v0.1
+retrieval; they exist for v0.2 SLIDERS-style extraction (see
+ADR-4 amendment 2026-04-29 §Notes).
+
+**Compatibility.** The `Chunker` Protocol signature is
+unchanged (still `chunk_file(path) -> list[Chunk]`). Code that
+reads only the original six fields continues to compile.
+`CHUNKER_VERSION` (per §Consequences) bumps because the
+emission shape changes — invalidates the SQLite cache once
+and only once.
+
+**Topic propagation.** When the source file has frontmatter
+with a `topic:` key (see frontmatter amendment in
+[`knowledge/README.md`](../README.md)), the chunker copies the
+value into every `Chunk.topic` produced from that file.
+Source files without frontmatter (e.g. `.py`, `.ps1`) emit
+`topic=None`. v0.1 retrieval ignores the field; it exists so
+that v0.2 SLIDERS-style extraction can amortize schema
+induction per topic without re-chunking.
+
+**Out of scope for this amendment.**
+
+- Per-symbol intra-symbol splitting — still gated by the
+  re-evaluation triggers above.
+- Topic auto-detection from corpus structure (path heuristics,
+  embedding clustering) — v0.2 follow-up. v0.1 only honours
+  the explicit frontmatter key.
+
 ## References
 
 - Research note: [`research/chunker-design.md`](../research/chunker-design.md) — full comparison + open questions + sample-test plan.
 - ADR-3: [`ADR-3-memory-architecture-variant.md`](./ADR-3-memory-architecture-variant.md) — Variant A frame.
-- ADR-4: [`ADR-4-storage-backend.md`](./ADR-4-storage-backend.md) — `chunks` schema and `CHUNKER_VERSION` cache contract.
+- ADR-4: [`ADR-4-storage-backend.md`](./ADR-4-storage-backend.md) — `chunks` schema (incl. 2026-04-29 amendment) and `CHUNKER_VERSION` cache contract.
+- [`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md) §7.2 / §10 R-5 — rationale for the 2026-04-29 amendment.
+- [`research/sliders-structured-reasoning-2026-04.md`](../research/sliders-structured-reasoning-2026-04.md) §3.1 — `m_G` / `m_L` chunking metadata.
 - universal-ctags: <https://github.com/universal-ctags/ctags> ·
   <https://docs.ctags.io/>.
 - markdown-it-py: <https://github.com/executablebooks/markdown-it-py>.
