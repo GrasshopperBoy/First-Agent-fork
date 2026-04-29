@@ -188,7 +188,7 @@ deny = [
   "**/.env.*",
   "**/*.pem",
   "**/*.key",
-  ".git/**",                      # never touch .git directly
+  "**/.git/**",                   # never touch .git directly
 ]
 ```
 
