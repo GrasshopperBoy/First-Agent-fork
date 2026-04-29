@@ -29,3 +29,4 @@ You do **not** need an ADR for routine code-level choices.
 | [3](./ADR-3-memory-architecture-variant.md) | Memory architecture variant for v0.1 | accepted |
 | [4](./ADR-4-storage-backend.md) | Storage backend for v0.1 | accepted |
 | [5](./ADR-5-chunker-tool.md) | Chunker tool selection for v0.1 | proposed |
+| [6](./ADR-6-tool-sandbox-allow-list.md) | Tool sandbox & path allow-list policy for v0.1 | accepted |
