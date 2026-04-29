@@ -35,7 +35,7 @@ changes the project state, update **both**.
 You should now have everything you need. Do not crawl the repo
 manually beyond this point.
 
-## Current state (as of 2026-04-28)
+## Current state (as of 2026-04-29)
 
 - **Stage:** Phase S scaffolding complete; start of first module
   implementation. Minimal `src/fa` package exists only as a CLI
@@ -77,6 +77,11 @@ manually beyond this point.
     contextualized chunking, schema induction, relevance gate,
     primary-key reconciliation, SQL-QA; mapping to ADR-3 / ADR-4
     / ADR-5 and v0.2 extraction-layer roadmap.
+  - [`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](./knowledge/research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
+    — cross-reference review of the two notes above against
+    ADR-1..5: gaps, tensions, 10 numbered recommendations
+    (R-1..R-10) and 10 open questions for lead decision before
+    Phase M starts.
 
 ## Next steps (intended order)
 
