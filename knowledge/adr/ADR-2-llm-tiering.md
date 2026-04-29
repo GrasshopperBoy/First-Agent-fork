@@ -127,9 +127,104 @@ judge:
   - Decision deferred to a future ADR: how to express token / cost
     budgets per role in the same config.
 
+## Amendments
+
+### Amendment 2026-04-29 — `tool_protocol` field + native-by-default; v0.1 inner-loop without Critic
+
+**Source.** Cross-reference review
+[`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
+§3.3, §9.6, §10 R-1 / R-7 — the ADR's per-role `primary →
+fallback` chain does not specify how the tools are wired into
+each model. Native-tool models (Anthropic, OpenAI, Qwen 3.6,
+Kimi 2.6, GLM-5.1) and prompt-only models accept tool calls in
+**different shapes**. A silent fallback from native to
+prompt-only would break the inner-loop. The user has confirmed
+that the current model picks (Qwen 3.6 / Kimi 2.6 / Claude
+latest) all support native tool-calling, so native is the
+default.
+
+Independently, ADR-2 §Decision lists Planner / Coder / Debug /
+Eval but does not name a separate **Critic / Reflector** role.
+[`research/agent-roles.md`](../research/agent-roles.md) §5.1
+proposes Planner / Executor / Critic as the minimum trio.
+Cross-reference §3.4 / §9.7 confirm v0.1 explicitly does
+**not** include a Critic (no reflection / self-correction loop).
+Eval (offline LLM-as-judge) is not a Critic — it judges
+finished work, not in-loop turns. This amendment fixes the
+terminology so a v0.2 implementer does not silently introduce a
+Critic.
+
+**Decision (additive to the original Decision section).**
+
+1. **`tool_protocol` field per-role in `~/.fa/models.yaml`.**
+   Allowed values: `native` | `prompt-only`. Default for **any
+   role that calls tools** is `native`. Default for the `judge`
+   role (LLM-as-judge, no tool calls) is irrelevant — set to
+   `native` for shape consistency, the inner-loop ignores it.
+
+   ```yaml
+   coder:
+     primary:   { provider: AnyProvider, model: "Nemotron-3-Super-49B", tool_protocol: native }
+     fallback:  { provider: openrouter, model: "qwen/qwen3-coder-27b", tool_protocol: native }
+   ```
+
+2. **No mixing of `native` and `prompt-only` within a single
+   role's `primary → fallback` chain.** The `models.yaml` loader
+   enforces this at startup; mixed configurations are a hard
+   error, not a warning. Rationale: silent shape changes mid-
+   session corrupt the conversation accumulator (see ADR-3
+   `hot.md` invariant).
+
+3. **Loop adapts to the role's `tool_protocol`, not to the
+   model.** This isolates the tool-shape decision from model
+   choice — swapping `coder.primary` to a different native model
+   is one-line; switching the whole role to `prompt-only` is
+   one-line; mixing within a chain is forbidden.
+
+4. **`prompt-only` is supported but not used in the v0.1
+   reference config.** Kept as an option for forks that pin to
+   models without native tool-calling (older OSS releases, some
+   self-hosted vLLM models). Implementation must include the
+   prompt-only path so swapping is config-only, never code.
+
+5. **v0.1 inner-loop has no Critic / Reflector role.** The roles
+   are exactly: Planner, Coder, Debug (manual escalation only —
+   see original `## Consequences` §«No auto-escalation»), Eval
+   (offline judge, out-of-band). Reflection / self-correction
+   loops are **v0.2** material; design is in-flight (user note,
+   Apr 2026) and will land as a separate ADR. The ADR-2
+   no-auto-escalation clause means "no cross-tier escalation",
+   not "no intra-role retry-loop"; an intra-role retry-loop
+   (e.g. Coder retrying after a failed `edit_file` validation)
+   stays allowed in v0.1 — see cross-reference §9.7.
+
+**Notes.**
+
+- The `tool_protocol` field is consumed by `src/fa/llm/router.py`
+  + the inner-loop module specified in the planned **Inner-loop
+  ADR** (cross-reference §10 R-1, not yet drafted). Until that
+  ADR lands, the implementer may stub a single `native`-only
+  inner-loop and mark `prompt-only` as `NotImplemented`; the
+  field still goes into the schema so the config never has to
+  be re-written.
+- Verified model coverage (user, Apr 2026): Qwen 3.6, Kimi 2.6,
+  GLM 5.1, Claude latest, Nemotron 3 Super — all native-tool.
+  Mid-tier OSS prompt-only fallbacks remain possible for
+  budget-constrained forks.
+
+**Consequence.** `models.yaml` schema gains a required
+`tool_protocol` field per role (with `native` as the default if
+unset, to keep current configs valid). The validator added in
+the implementation PR refuses `primary` and `fallback` blocks
+that disagree on `tool_protocol`. Rejecting the config at startup
+is a hard error: this matches the original ADR's "fails loudly"
+posture for hard-task escalation.
+
 ## References
 
 - [`project-overview.md`](../project-overview.md) §6 (key constraints — LLM providers).
 - [`research/memory-architecture-design-2026-04-26.md`](../research/memory-architecture-design-2026-04-26.md) §1 bullet 2 (mixed-LLM design constraint).
-- [`research/agent-roles.md`](../research/agent-roles.md) §5.1 (Planner / Executor / Critic minimum-set rationale; Coder maps to Executor here).
+- [`research/agent-roles.md`](../research/agent-roles.md) §5.1 (Planner / Executor / Critic minimum-set rationale; Coder maps to Executor here; v0.1 omits Critic — see 2026-04-29 amendment).
+- [`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md) §3.3 / §9.6 / §10 R-1 / R-7 — rationale for the 2026-04-29 amendment.
+- [`research/how-to-build-an-agent-ampcode-2026-04.md`](../research/how-to-build-an-agent-ampcode-2026-04.md) §3.1 / §4 — native tool-calling shape.
 - PR #17 review (`https://github.com/GITcrassuskey-shop/First-Agent/pull/17`) — Q2 + Q3 verbatim answers.
