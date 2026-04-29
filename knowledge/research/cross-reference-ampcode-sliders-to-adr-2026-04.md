@@ -337,34 +337,18 @@ version-pinned»). Это **не** per-turn critic.
 сама видит результат своего же `read_file`, корректирует
 себя.
 
-`agent-roles.md` §5.1 «Рекомендованный минимальный набор ролей
-для v0.1» предлагает **другие 4 роли**:
+`agent-roles.md` §5.1 предлагает **другие четыре роли**:
+Task Specifier (расплывчатый ввод → prompt, CAMEL §3.5),
+Planner (specified task → шаги), Executor (шаг плана; ReAct
+внутри), Critic/Reflector (per-turn structured feedback,
+CAMEL §3.6 + Reflexion).
 
-| # | Роль | Назначение | Источник |
-|---|---|---|---|
-| R1 | Task Specifier | расплывчатый ввод → структурированный prompt | CAMEL §3.5 |
-| R2 | Planner | specified task → шаги | CAMEL + Workforce |
-| R3 | Executor | один шаг плана; ReAct внутри | ReAct + CAMEL Assistant |
-| R4 | Critic / Reflector | оценивает; structured feedback | CAMEL §3.6 + Reflexion |
-
-И в ADR-2 (Planner/Coder/Debug/Eval), и в agent-roles.md
-(Specifier/Planner/Executor/Critic) — четыре роли, но **они
-разные**. Маппинг:
-
-| ADR-2 | agent-roles.md | Совпадает? |
-|---|---|---|
-| Planner | Planner | да (одно имя, одна суть) |
-| Coder | Executor | да (ADR-2 говорит «Coder = mid-tier OSS», agent-roles.md говорит «Executor = ReAct loop») |
-| Debug (top tier когда Coder fail'ит) | — | нет — agent-roles.md этого не имеет |
-| Eval (LLM-as-judge offline) | — | нет — это не роль в loop'е, это benchmark |
-| — | Task Specifier | нет — ADR-2 не упоминает |
-| — | Critic / Reflector (per-turn) | нет — ADR-2 не упоминает |
-
-Из четырёх возможных пар две совпали (Planner=Planner,
-Coder≈Executor), две — мимо. **Это не противоречие, а
-несогласованность**: ADR-2 целится в выбор моделей,
-agent-roles.md — в pipeline ролей. Они дополняют друг друга,
-но не объединены явно.
+Маппинг ADR-2 ↔ agent-roles.md: Planner=Planner и
+Coder≈Executor совпадают; Debug (top-tier escalation) и Eval
+(offline LLM-as-judge) — только в ADR-2; Task Specifier и
+Critic/Reflector — только в agent-roles.md. Это не
+противоречие, а несогласованность: ADR-2 про выбор моделей,
+agent-roles.md про pipeline ролей.
 
 Ампкод свидетельствует: **per-turn Critic не обязателен**
 (модель self-corrects через tool feedback). Это поддерживает
@@ -584,58 +568,28 @@ section в ADR-3 или в parent
 
 ### 5.4 Натяжка: hot.md → session archive vs SLIDERS extract
 
-ADR-3 §Decision:
+`hot.md` в ADR-3 — per-session conversation summary (Markdown,
+append-only, grep-retrieval, archive). SLIDERS-extract §3.5 —
+per-corpus structured DB (SQL, UPSERT+reconcile, SQL-
+retrieval, durable cache). Они на разных горизонтах и
+дополняют друг друга. Но в `docs/architecture.md`
+§«Архитектура памяти» (working/episodic/semantic/procedural)
+SLIDERS-style является пятым типом «structured semantic» —
+это не отражено.
 
-> «`hot.md` session summary, auto-archived to
-> `notes/sessions/<date>.md` at session end (UC1 episodic-light).»
-
-`hot.md` — это **per-session conversation summary**. SLIDERS-нота
-§3.5 (SQL Loop) — это **per-corpus structured QA**. Они на
-разных горизонтах:
-
-| | hot.md (ADR-3) | SLIDERS extract (SLIDERS §3) |
-|---|---|---|
-| Granularity | per-session | per-corpus |
-| Form | Markdown summary | SQL DB |
-| Lifetime | минута → час → архив | дни → месяцы → reconciliation |
-| Update | append-only | UPSERT + reconcile |
-| Retrieval | grep по архивам | SQL queries |
-
-Они **дополняют друг друга**, не конкурируют. Но в
-`docs/architecture.md` § «Архитектура памяти» это разделение
-четырёх типов памяти (working / episodic / semantic / procedural)
-**не упоминает SLIDERS-style extraction** как отдельный слой.
-SLIDERS — это **ещё один semantic-layer**, специально под
-aggregation queries.
-
-→ **Не conflict**, но дополнение к taxonomy. Если выбирать
-аккуратно — это пятый тип, «structured semantic», между
-semantic (knowledge/) и procedural (skills/). Cheap to
-note в `docs/architecture.md`. См. §10 R-4 как часть ADR-3
-amendment.
+→ **Не conflict**, дополнение к taxonomy. См. §10 R-4.
 
 ### 5.5 Tension: schema-induction зависит от вопроса
 
 SLIDERS-нота §3.2 «Schema Induction»: для каждого нового
-вопроса — новая схема. Авторы amortize'ят (§6) через
-topic-clustering. Для FA это **дополнительная UX-сложность**:
-
-```text
-fa ingest --topic finance ./reports/    # extract + reconcile
-fa ingest --topic tasks   ./inbox/      # отдельная схема
-fa ingest --topic wiki    ./notes/      # ещё отдельная
-fa ask --topic finance "lowest long-term borrowing?"
-```
-
-UC3 в ADR-1 — «local docs → wiki». Если этот корпус будет
-один большой mixed-bag — schema-induction для каждого вопроса
-**дорогой**. Если по топикам — нужен `--topic`-флаг и место
-для хранения `<topic>` в frontmatter.
+вопроса — новая схема; авторы amortize'ят (§6) через
+topic-clustering. Для FA это UX-сложность: при ingestion нужен
+`--topic`-флаг (`fa ingest --topic finance ./reports/`) и поле
+`<topic>` в frontmatter, иначе mixed-bag corpus = дорогая
+schema-induction per question.
 
 → **Не v0.1 блокер**, но cheap forward-compat: добавить
-`topic:` (optional) в frontmatter-schema уже сейчас. Когда v0.2
-SLIDERS-style раскатывается — амортизация работает out of the
-box. См. §10 R-6.
+`topic:` (optional) в frontmatter-schema уже сейчас. См. §10 R-6.
 
 ---
 
@@ -664,75 +618,33 @@ is additive — same DB file, new table, same connection pool»
 ### 6.2 Gap: chunks-схема не имеет provenance-fields
 
 SLIDERS §3.3 (Structured Extraction) хранит для каждой
-extracted-cell:
+extracted-cell `value` (нормализованное), `provenance`
+(минимальный текстовый span) и `rationale` (LLM-generated). §8
+SLIDERS-ноты предлагает вынести provenance-fields в
+chunks уже в v0.1, иначе v0.2 extraction-layer потребует
+full reindex.
 
-> `value` (нормализованное), `provenance` (минимальный
-> текстовый span из исходного документа), `rationale`
-> (LLM-generated «почему я считаю, что value соответствует quote»).
+Текущая схема ADR-4 §Decision имеет `id`, `path`, `anchor`,
+`lang`, `body`, `mtime`, `sha256`. `path` ≈ `source_path` (OK);
+`anchor` — это heading slug, не document title.
 
-SLIDERS-нота §8 предлагает:
+Не хватает четырёх полей:
 
-> «Сохранять provenance в чанках уже в v0.1. Это дешёвое
-> расширение схемы chunks (добавить колонки `source_path`,
-> `byte_offset`, `parent_doc_title`). Эти поля не используются
-> в Variant A, но без них v0.2 extraction-layer придётся
-> переиндексировать с нуля.»
-
-Текущая схема ADR-4 §Decision имеет:
-
-| Колонка | Что хранит | SLIDERS-нужное? |
-|---|---|---|
-| `id` | INTEGER PK | — |
-| `path` | TEXT | да (это `source_path` фактически) |
-| `anchor` | TEXT (heading slug) | частично — это **не** parent doc title, это heading в документе |
-| `lang` | TEXT | да |
-| `body` | TEXT | да |
-| `mtime` | REAL | да |
-| `sha256` | TEXT | да (для invalidation) |
-
-То есть `path` ≈ `source_path` — есть. `anchor` — частично, это
-**heading slug**, не **document title**.
-
-Не хватает:
-
-- **`parent_title`** — название самого документа (если файл
-  имеет H1 / front-matter title). Для md-файлов — берётся из
-  frontmatter `title:` или первой H1. Для кода — это путь
-  файла, тогда `parent_title = filename`.
-- **`breadcrumb`** — иерархия секций до этой anchor'и. Например
-  для `# README → ## Setup → ### Linux`, breadcrumb для
-  под-anchor'и Linux = `["README", "Setup"]`. SLIDERS §3.1 называет
-  это `m_L` (local metadata).
-- **`byte_start` / `byte_end`** — байтовые офсеты чанка в файле.
-  SLIDERS hint'ует это как «минимальный текстовый span поддерживающий
-  значение». В нашем случае — байт-офсеты в `body` source-файла.
+- **`parent_title`** — название самого документа (frontmatter
+  `title:` / первая H1 / filename для кода).
+- **`breadcrumb`** — иерархия секций до anchor'и
+  (например `["README", "Setup"]`); SLIDERS §3.1 называет это
+  `m_L` (local metadata).
+- **`byte_start` / `byte_end`** — байтовые офсеты чанка
+  («минимальный текстовый span» в SLIDERS-терминах).
 - **`topic`** (optional, для v0.2 amortization).
 
-`line_start` / `line_end` уже есть в ADR-5 §Decision Chunk
-dataclass:
+ADR-5 `Chunk` dataclass уже имеет `line_start`/`line_end`, но
+ADR-4 их не хранит — это current inconsistency между ADR-4
+и ADR-5.
 
-```python
-@dataclass(frozen=True)
-class Chunk:
-    path: str
-    anchor: str
-    lang: str
-    body: str
-    line_start: int
-    line_end: int
-```
-
-То есть **в pythonic Chunk-объекте они есть**, но **в SQLite
-chunks-схеме (ADR-4 §Decision) — нет**. Это inconsistency:
-chunker эмитит line_start/line_end, но storage их не хранит.
-Уже текущий gap в ADR-4 vs ADR-5.
-
-→ **Gap-5**: схема `chunks` в ADR-4 не хранит line_start /
-line_end (хотя ADR-5 их вычисляет). Это **уже текущий bug** в
-согласованности ADR. Cheap fix: расширить `chunks` колонками
-из dataclass'а и добавить `parent_title`, `breadcrumb`,
-`byte_start`, `byte_end` (последние два — для v0.2 готовности).
-См. §10 R-5.
+→ **Gap-5**: cheap fix — расширить `chunks` колонками из
+Chunk dataclass'а плюс четыре новых поля. См. §10 R-5.
 
 ### 6.3 Tension: scaling SQLite на extraction-layer
 
@@ -818,29 +730,13 @@ extraction layer должен будет re-chunk весь корпус.
 
 ADR-5 §Decision Chunk dataclass — `path`, `anchor`, `lang`,
 `body`, `line_start`, `line_end`. Нет `parent_title`,
-`breadcrumb`, `byte_offset`.
-
-Cheap forward-compat: расширить Chunk dataclass до:
-
-```python
-@dataclass(frozen=True)
-class Chunk:
-    path: str
-    anchor: str
-    parent_title: str        # H1 / frontmatter-title документа, или filename для кода
-    breadcrumb: tuple[str, ...]  # путь section headings до anchor (пусто для кода или config)
-    lang: str
-    body: str
-    line_start: int
-    line_end: int
-    byte_start: int          # офсет начала чанка в исходном файле
-    byte_end: int            # офсет конца чанка в исходном файле
-```
-
-Эта правка — additive, не breaking. ADR-5 §Decision явно
-говорит «Stable interface… A future swap to TreeSitterChunker
-must not change the interface». Расширение полей dataclass'а
-без удаления существующих — back-compat по сигнатуре.
+`breadcrumb`, `byte_offset`. Cheap forward-compat: расширить
+Chunk dataclass четырьмя полями — `parent_title`,
+`breadcrumb` (tuple section-headings), `byte_start`, `byte_end`.
+Эта правка additive, не breaking; ADR-5 §Decision явно
+говорит «Stable interface… future TreeSitterChunker swap must
+not change interface» — расширение полей без удаления back-
+compat.
 
 → **Gap-6**: Chunk dataclass без `parent_title` / `breadcrumb`
 / `byte_offsets` потребует re-chunk при добавлении extraction
@@ -1006,32 +902,17 @@ ADR-1 говорит про eval-baseline в общем, не специфици
 extractor, reconciler, answer-synth. Они **не** появляются в
 v0.1 inner-loop, но появятся в v0.2 extraction layer.
 
-Возможный mapping:
-
-| Pipeline phase | v0.1 roles (ADR-2) | v0.2 + SLIDERS добавление |
-|---|---|---|
-| User ↔ system | (Planner) | Planner |
-| Tool-loop / coding | Coder | Coder |
-| Hard-task escalation | Debug | Debug |
-| Offline judge | Eval | Eval |
-| **Schema induction** | (none) | **Schema-Inducer** (mid-tier OSS) |
-| **Extraction** | (none) | **Extractor** (mid-tier OSS, parallel) |
-| **Reconciliation** | (none) | **Reconciler** (top-tier OSS) |
-| **SQL-loop QA** | (none) | **SQL-Agent** (top-tier OSS) |
-| **Per-turn critic** | (none) | (optional v0.2+, agent-roles.md R4) |
-| **Task specifier** | (none) | (optional v0.2+, agent-roles.md R1) |
-
-То есть **agent-roles.md** и **SLIDERS-style** оба добавляют
-роли, **не пересекающиеся** друг с другом. v0.1 минимум
-(Planner + Coder + Debug + Eval) — overlaps c agent-roles.md
-только на Planner и Coder=Executor; не overlaps с SLIDERS
-ролями вообще.
-
-Это значит: **в v0.1 inner-loop'е ролей агентов столько,
-сколько в ADR-2**. agent-roles.md и SLIDERS-roles — **future
-work**. Но это надо явно зафиксировать в ADR-2 §Consequences,
-иначе implementer попытается реализовать «полный набор»
-из agent-roles.md (Specifier + Critic) без необходимости.
+v0.2 mapping: к v0.1 набору (Planner / Coder / Debug / Eval)
+SLIDERS добавляет четыре новых роли: **Schema-Inducer**
+(mid-tier OSS), **Extractor** (mid-tier, parallel), **Reconciler**
+(top-tier OSS), **SQL-Agent** (top-tier). agent-roles.md
+отдельно добавляет Task Specifier и per-turn Critic.
+Ни SLIDERS, ни agent-roles.md не пересекаются друг с
+другом и оба — future work. В ADR-2 §Consequences явно
+зафиксировать: v0.1 inner-loop — ровно четыре роли ADR-2,
+никаких Specifier / Critic / Schema-Inducer / Extractor /
+Reconciler / SQL-Agent. Иначе implementer попытается
+реализовать «полный набор» из agent-roles.md без необходимости.
 
 → См. §10 R-7.
 
@@ -1105,54 +986,30 @@ Mitigation — ADR-3 amendment, добавляющий Variant D как
 ### 9.5 hot.md → notes/sessions/<date>.md cycle vs ampcode
 conversation accumulator
 
-ADR-3 §Decision: «hot.md auto-archived to
-notes/sessions/<date>.md at session end». Ампкод conversation
-— это in-process slice без диск-сериализации.
-
-Натяжка: **когда** именно hot.md промежуточно записывается? В
-ампкод-loop'е есть только in-RAM `conversation`. Если FA
-крашит между tool-call'ами (Ctrl-C, OOM, network glitch на LLM
-call'е) — хочется иметь disk-state. Но disk-write на каждый
-tool-call — overhead.
-
-ADR-3 не специфицирует. Это implementation-decision: **append
-к hot.md после каждого tool-result block'а** vs **только при
-clean shutdown**. Я склонен к первому (durability > overhead),
-но это спот для §10 R-1 как часть loop ADR.
+ADR-3 пишет «hot.md auto-archived at session end» но не
+специфицирует *когда* промежуточные writes. Ампкод
+conversation — in-RAM без диск-сериализации. При Ctrl-C / OOM
+между tool-call'ами данные теряются. Выбор «append к hot.md
+после каждого tool-result» vs «clean shutdown only» —
+implementation-decision в §10 R-1 (loop ADR).
 
 ### 9.6 ADR-2 fallback chains не учитывают tool-protocol
 
-ADR-2 §Decision: per-role `primary → fallback`. Но если
-`primary = native-tool model` и `fallback = prompt-only model`
-— переход между ними **меняет shape вызова tool'ов**. Это надо
-либо:
-
-- **Запретить** mixing native + prompt-only в одной роли
-  (constraint в models.yaml validator), или
-- **Унифицировать** на prompt-only (всегда; native — оптимизация
-  поверх).
-
-Сейчас не зафиксировано. См. §10 R-1 как подпункт.
+ADR-2 per-role `primary → fallback` не выбирает между native-
+tool и prompt-only protocol — это меняет shape вызова.
+Либо запретить mixing в одной роли (models.yaml validator),
+либо унифицировать на prompt-only с native как оптимизацией.
+См. §10 R-1.
 
 ### 9.7 «No auto-escalation» (ADR-2) vs SLIDERS reconciliation
 iteration
 
-ADR-2 §Decision: «No auto-escalation; Coder fails loudly on
-hard tasks». SLIDERS §3.4 (Reconciliation) использует
-**iterative agent с auto-correction loop'ом** — он сам
-повторяет до сходимости (1.28 average iterations per task).
-
-Это **внутри одной роли** (Reconciler), не cross-tier
-escalation. То есть **формально** не противоречит ADR-2.
-Но если v0.2 имплементер прочитает ADR-2 буквально («no
-auto-anything») — может запретить retry-loop'ы тоже.
-
-Mitigation — терминология: «no auto-escalation» = «no
-cross-tier» (Coder не превращается в Debug автоматически).
-В рамках одной роли retry-loop'ы — OK. Зафиксировать в ADR-2
-amendment или glossary.
-
-→ См. §10 R-8.
+ADR-2 «no auto-escalation» = no cross-tier (Coder не
+превращается в Debug автоматически). SLIDERS-Reconciler имеет
+intra-role retry-loop (1.28 avg iterations) — это внутри
+одной роли, формально не противоречит. В v0.2-implementer
+может неправильно прочитать. Зафиксировать
+терминологию в ADR-2 amendment / glossary. См. §10 R-8.
 
 ---
 
@@ -1407,16 +1264,11 @@ Multiple-choice; ответы войдут в будущие ADR / amendment'ы.
 
 ## 12. Что эта нота намеренно НЕ покрывает
 
-- Конкретные слаги моделей (оставляем provider-catalogs на
-  момент implementation; см. ADR-2 §«Note on model slugs»).
-- Собственные performance benchmark'и (все цифры заёмные).
-- Multi-agent / Workforce / handoff паттерны
-  (`agent-roles.md` §3.7-3.10) — v0.2+.
-- Аргументация за/против Variant B (Mem0-pipeline) —
-  v0.2-кандидат с собственным research-treatment'ом.
-- TG-bot (UC4), PDF/DOCX/YouTube extractors — deferred,
-  ничего не меняется.
-- Конкретные prompt-templates (`knowledge/prompts/`).
+Конкретные model-slugs («Note on model slugs» в ADR-2),
+собственные perf-benchmark'и, multi-agent / Workforce / handoff
+(`agent-roles.md` §3.7-3.10), Variant B (Mem0) аргументы, UC4
++ PDF/DOCX/YouTube extractors, prompt-templates — всё v0.2+
+или deferred.
 
 ---
 
@@ -1441,17 +1293,13 @@ Multiple-choice; ответы войдут в будущие ADR / amendment'ы.
 
 ## 14. Ограничения этой ноты
 
-- **Single-pass synthesis.** Один Devin-сеанс с одним read-
-  проходом — некоторые тонкие натяжки могли быть пропущены.
-- **Не воспроизведены факты.** Все цифры из parent-нот, ничего
-  не replicated. Особенно — ампкод «400 строк» и SLIDERS
-  «$0.76 / question».
-- **Не клонировались upstream-репо** ампкода и stanford-oval/sliders.
-- **Не привлекался second LLM как peer-reviewer.**
-- **Не запущены фикстурные тесты edit-shape (R-3).**
-- **Дата.** На 2026-04-29 Phase S complete, src/fa пуст.
-  Если читать через месяц после Phase M start — «cheap
-  migration» оценка R-5 устаревает.
+Frontmatter `chain_of_custody` фиксирует single-pass synthesis,
+source-pointers на parent-ноты и ADR. Дополнительно: цифры
+из parent-нот («400 строк» / «$0.76 / question») не реплицировались;
+upstream-репо ампкода и stanford-oval/sliders не клонировались;
+second-LLM peer-review нет; edit-shape фикстуры (R-3) не
+запускались. Оценка «cheap migration» в R-5 верна только пока
+src/fa пуст; после Phase M start — устаревает.
 
 ---
 
