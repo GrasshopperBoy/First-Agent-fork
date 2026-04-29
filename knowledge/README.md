@@ -88,6 +88,7 @@ mentions:             # external entities (people, projects, papers, repos, URLs
   - "OpenRouter"
   - "https://arxiv.org/abs/2504.19413"
 confidence: extracted # extracted | inferred | ambiguous
+topic: pwsh           # corpus-grouping key for v0.2 SLIDERS-style extraction
 ---
 ```
 
@@ -106,10 +107,36 @@ Field semantics:
   copied verbatim from a primary source; `inferred` if synthesised by
   the author / LLM from multiple sources; `ambiguous` if the source-to-
   claim mapping is unclear and the note needs a verification pass.
+- **`topic`** — corpus-grouping key. Free-form short string
+  (`pwsh`, `trading`, `dotfiles`, `arxiv-rag`, …). Files that share
+  a `topic` are expected to share enough structure that a v0.2
+  SLIDERS-style extractor can amortize one schema-induction pass
+  across the whole group (see
+  [`research/sliders-structured-reasoning-2026-04.md`](./research/sliders-structured-reasoning-2026-04.md)
+  §3.2 for the why; rationale for adding the field now is in
+  [`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](./research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
+  §10 R-6). The chunker propagates the value into every `Chunk`
+  produced from the file (see
+  [`adr/ADR-5-chunker-tool.md`](./adr/ADR-5-chunker-tool.md)
+  Amendment 2026-04-29). v0.1 retrieval ignores it; storing it
+  now means v0.2 extraction does not require a full re-chunk.
 
 None of these fields are validated by tooling yet. They exist so that
 when v0.2 indexer lands, the additive backfill is mechanical, not a
 schema migration.
+
+### `notes/inbox/` — `topic:` is the cheap default
+
+`notes/inbox/` is the v0.2 raw-capture directory (per
+[`research/memory-architecture-design-2026-04-26.md`](./research/memory-architecture-design-2026-04-26.md)
+§4 — "drop-in inbox watcher"). Files there are short and often
+share a single subject across many entries (one PowerShell macro
+folder, one trading-strategy notebook, one paper-summaries dump).
+Tagging each file with `topic:` at capture time is the cheapest
+possible way to keep the v0.2 SLIDERS amortization path open
+without retro-tagging later. v0.1 inbox-watcher is not yet
+implemented; this is documented here so that whoever ships it
+adds the frontmatter pass-through from day one.
 
 ## What goes where
 
