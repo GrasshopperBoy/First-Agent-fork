@@ -2,8 +2,13 @@
 
 > **Status:** draft research note, 2026-04-23. Synthesizes transcripts of five
 > YouTube videos into a concept map + ranking + concrete recommendations for
-> First-Agent. Meant to be loaded as context when making architecture decisions
-> (Шаги 2–5 из [README](../../README.md#4-план-исследования-перед-тем-как-писать-код)).
+> First-Agent.
+>
+> **Историческая справка:** написан до принятия ADR-1..ADR-6. Контент остаётся
+> валидным как input для будущего ADR-7 (inner-loop / tool-contract).
+> Текущие архитектурные решения — в
+> [`knowledge/adr/README.md`](../adr/README.md); полный inventory всех
+> документов — в [`knowledge/llms.txt`](../llms.txt).
 >
 > Источники — прямые ссылки на видео в §[Sources](#sources). Транскрипты
 > вытянуты через публичные сервисы; цитаты даны дословно, с таймкодами.

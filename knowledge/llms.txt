@@ -9,7 +9,12 @@
 > This file is an index for LLM agents that want to ingest the
 > project documentation in one fetch. Convention: see
 > https://llmstxt.org/. Paths below are GitHub raw URLs against
-> the `main` branch.
+> the `main` branch of `GITcrassuskey-shop/First-Agent` (upstream).
+> Primary working repo is the fork
+> `GrasshopperBoy/First-Agent-fork`; both repos' `main` are kept
+> in sync by the lead via cross-fork PRs. If a URL below 404s
+> mid-cycle, replace `GITcrassuskey-shop/First-Agent` with
+> `GrasshopperBoy/First-Agent-fork` and retry.
 
 ## Repo entrypoints
 
@@ -25,7 +30,7 @@
 - [docs/prompting.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/prompting.md): T1-T5 prompt templates and anti-patterns.
 - [docs/devin-reference.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/devin-reference.md): Devin-specific reference (Knowledge notes, Skills, Playbooks).
 - [docs/glossary.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/glossary.md): Project glossary.
-- [docs/agent%20creation%20github.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/agent%20creation%20github.md): Step-by-step agent-creation tutorial.
+- [docs/agent-creation-github.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/agent-creation-github.md): Step-by-step agent-creation tutorial.
 
 ## Project knowledge (`knowledge/`)
 
