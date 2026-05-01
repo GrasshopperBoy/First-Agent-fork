@@ -220,6 +220,120 @@ that disagree on `tool_protocol`. Rejecting the config at startup
 is a hard error: this matches the original ADR's "fails loudly"
 posture for hard-task escalation.
 
+## Amendment 2026-05-01 — MCP forward-compat tool-shape convention
+
+**Context.** Three independent sources surveyed in
+[`research/semi-autonomous-agents-cross-reference-2026-05.md`](../research/semi-autonomous-agents-cross-reference-2026-05.md)
+§2.3-A and §3.3-B (deep-research-report on agent
+architectures, semi-autonomous-agents research, and the
+`nextlevelbuilder/goclaw` README) call the **Model Context
+Protocol (MCP)** the de-facto industry standard for the
+agent ↔ tools boundary as of 2026. MCP defines a
+JSON-RPC-shaped contract between an MCP host (the agent)
+and one or more MCP servers (which expose tools, resources,
+and prompts).
+
+The original Decision and the 2026-04-29 amendment fix the
+agent ↔ LLM contract (`tool_protocol: native | prompt-only`).
+They say nothing about the **agent ↔ tools** contract — i.e.
+how the inner-loop calls a tool function, whether locally
+in-process or eventually via an MCP server. Without an
+explicit convention, the future inner-loop ADR (cross-
+reference §10 R-1, now planned as ADR-7) might design a
+tool-shape that is **not** JSON-RPC-shaped, which would force
+re-design when v0.2 wants to expose internal tools as MCP
+servers (so other MCP hosts — Claude Desktop, third-party
+agents — can use them, or so heavy tools like `mcp-runner` /
+`mcp-web` can be moved to separate processes).
+
+This amendment fixes the convention now, at zero
+implementation cost, because native function-calling APIs
+(Anthropic, OpenAI, Qwen-native) already deliver
+JSON-shaped tool inputs and outputs.
+
+**Decision (additive to the original Decision section and
+the 2026-04-29 amendment).**
+
+1. **MCP-shaped tool signatures.** All v0.1 tools — including
+   the in-process Python functions used by the inner-loop —
+   expose a JSON-RPC-shaped surface:
+
+   ```text
+   request:  { name: str, params: dict[str, Any] }
+   response: { result: Any | None, error: { code: int, message: str } | None }
+   ```
+
+   Tools are invoked through a single dispatcher that
+   accepts and returns these shapes; tool-specific Python
+   code does not appear in the LLM-facing protocol. Tool
+   parameters are described by **JSON Schema** (parsed from
+   Python type hints + Pydantic models or hand-written),
+   which is the MCP-spec shape. Tool errors carry a numeric
+   code and a string message, matching JSON-RPC `error`
+   semantics.
+
+2. **Stable tool-name policy.** Tool names are stable strings
+   (`repo.read`, `repo.search`, `git.status`, …) — not
+   Python function objects. Renaming a tool is a v-bump
+   event (semantic versioning of the tool catalogue). This
+   matches the way MCP servers identify tools by name.
+
+3. **No `mcp` package dependency in v0.1.** This amendment
+   defines a **convention**, not a dependency. The agent does
+   not `pip install mcp` in v0.1; it implements an in-process
+   dispatcher whose **shape** is MCP-compatible. Adding the
+   real `mcp` Python package, spawning external mcp-servers,
+   exposing internal tools as remote MCP services, etc. — all
+   v0.2 work, gated by a follow-up ADR.
+
+4. **Inner-loop ADR (future ADR-7) inherits the convention.**
+   When ADR-7 lands, its tool-registry contract must use this
+   request/response shape. The ADR-7 author MAY add fields
+   (e.g. an `id` for streaming tool-calls, a `metadata`
+   block) but MUST NOT change the existing two fields
+   (`name`, `params` for request; `result`, `error` for
+   response) without a separate amendment to this ADR-2.
+
+5. **`tool_protocol` field semantics extended.** The existing
+   `tool_protocol: native | prompt-only` field per role
+   (2026-04-29 amendment) describes only the **agent ↔ LLM**
+   side. The **agent ↔ tools** side is fixed by this
+   amendment as JSON-RPC-shaped regardless of `tool_protocol`
+   value. A `prompt-only` role still emits JSON-shaped
+   tool-calls (just embedded in text it has to parse) and
+   the dispatcher still receives JSON-shaped requests.
+
+**Notes.**
+
+- This amendment is a **forward-compat convention**, not a
+  constraint that changes any v0.1 implementation surface
+  visible to the user. The tool-call cost is zero new code:
+  every native function-calling provider (Anthropic, OpenAI,
+  Qwen-native, Kimi, GLM, Nemotron) already produces
+  JSON-shaped tool-call objects, and any prompt-only
+  fallback would have to parse JSON from the LLM output
+  anyway.
+- The MCP spec (`https://modelcontextprotocol.io`) is still
+  evolving (transport layer changes between 2024 and
+  2025-2026 — added HTTP+SSE alongside STDIO). Pinning to a
+  specific transport in v0.1 would be premature; we only
+  pin to **shape**.
+- ADR-6 sandbox check is the canonical pre-tool hook in this
+  shape: it intercepts the dispatcher's request, validates
+  the path argument against the allow-list, and either
+  forwards the request or returns an `error` response. This
+  is the same shape ADR-7 will use when it formalises
+  hooks (cross-reference R-1 input from 2026-05-01 note
+  §7.1).
+
+**Consequence.** Tool registry implementation (deferred to
+ADR-7 / Phase M PR) must produce a JSON-RPC-shaped dispatcher
+even though tools are in-process Python functions in v0.1.
+This costs no extra code (native function-calling produces
+the right shape natively), buys zero v0.1 user-visible
+features, and keeps v0.2 MCP-server distribution as a
+config-only / wrapper-only change.
+
 ## References
 
 - [`project-overview.md`](../project-overview.md) §6 (key constraints — LLM providers).
@@ -227,4 +341,6 @@ posture for hard-task escalation.
 - [`research/agent-roles.md`](../research/agent-roles.md) §5.1 (Planner / Executor / Critic minimum-set rationale; Coder maps to Executor here; v0.1 omits Critic — see 2026-04-29 amendment).
 - [`research/cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md) §3.3 / §9.6 / §10 R-1 / R-7 — rationale for the 2026-04-29 amendment.
 - [`research/how-to-build-an-agent-ampcode-2026-04.md`](../research/how-to-build-an-agent-ampcode-2026-04.md) §3.1 / §4 — native tool-calling shape.
+- [`research/semi-autonomous-agents-cross-reference-2026-05.md`](../research/semi-autonomous-agents-cross-reference-2026-05.md) §2.3-A / §3.3-B / §7.1 — rationale for the 2026-05-01 MCP forward-compat amendment.
+- MCP specification: [https://modelcontextprotocol.io](https://modelcontextprotocol.io) — JSON-RPC + STDIO/HTTP+SSE transport.
 - PR #17 review (`https://github.com/GITcrassuskey-shop/First-Agent/pull/17`) — Q2 + Q3 verbatim answers.

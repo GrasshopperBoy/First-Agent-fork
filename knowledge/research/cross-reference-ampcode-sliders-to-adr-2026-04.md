@@ -1228,8 +1228,29 @@ Multiple-choice; ответы войдут в будущие ADR / amendment'ы.
 
 - **Q-1. Inner-loop ADR (R-1) — форма:**  отдельный ADR-6 «inner-
   loop + tool contract».
+  > **Status:** superseded by reality 2026-05-01. ADR-6 был
+  > занят отдельным sandbox-policy ADR (PR #6, merged
+  > 2026-04-29 — см. Q-2 ниже). Inner-loop ADR теперь
+  > планируется как **ADR-7** (свободный слот). Решение
+  > подтверждено лидом 2026-05-01 (option «accept-as-is» по
+  > §11 reconciliation в
+  > [`semi-autonomous-agents-cross-reference-2026-05.md`](./semi-autonomous-agents-cross-reference-2026-05.md)
+  > §7.2). Ссылочные пункты в других нотах, упоминающие
+  > «ADR-6 inner-loop», следует читать как «ADR-7 inner-loop
+  > (future)».
 - **Q-2. Sandbox policy (R-2) — форма:** amendment к ADR-1 §«Concrete
   v0.1 in-scope list».
+  > **Status:** superseded by reality 2026-05-01. Sandbox
+  > policy была оформлена как **отдельный ADR-6** (PR #6,
+  > merged 2026-04-29) с 350+ строк policy / TOML / globs /
+  > audit-log / one-shot bypass — слишком объёмно для
+  > §«Concrete v0.1 in-scope list» ADR-1. ADR-1 без
+  > amendment по этому пункту. Решение подтверждено лидом
+  > 2026-05-01 (option «accept-as-is» по §11 reconciliation
+  > в
+  > [`semi-autonomous-agents-cross-reference-2026-05.md`](./semi-autonomous-agents-cross-reference-2026-05.md)
+  > §7.2 — отдельный ADR подтверждается independent reference
+  > goclaw 5-layer permission system).
 - **Q-3. Edit-format фикстура (R-3) — формат будущего решения:**
   string-replace OK на всех тиерах → запинить в loop ADR.
 - **Q-4. Variant D (R-4) — где живёт:** (a) amendment к ADR-3,

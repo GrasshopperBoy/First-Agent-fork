@@ -90,6 +90,61 @@ volatile-store work that will support it.
   [`project-overview.md`](../project-overview.md) §4.
 - YouTube / Whisper / video ingest.
 
+## Amendment 2026-05-01 — UC5 added to deferred list
+
+**Context.** During the cross-reference research session of
+2026-05-01, the project lead added a fifth use case:
+
+> UC5 — Semi-autonomous research/experiment across different
+> LLM models on the same task, producing comparable research
+> docs at the end with a comparison chart.
+
+This is distinct from UC2 (continuous multi-source research)
+and from agent-team orchestration: UC5 is a **single research
+task executed by N different LLM models in parallel or
+sequentially**, with a structured comparison report at the
+end. Examples: «прогнать одну и ту же research-задачу через
+Claude / Qwen / Kimi / GLM, получить 4 одностилевых ноты +
+diff-chart».
+
+**Decision (additive to the original Decision section).**
+
+UC5 is **out of v0.1 scope** and added to the
+`Concrete v0.1 deferred list`. Rationale:
+
+1. UC5 requires a multi-LLM execution-runner that is not part
+   of any v0.1 component (the inner-loop in ADR-7-future is
+   single-LLM-per-session by design).
+2. UC5 requires a templated research-doc structure beyond
+   what `knowledge/README.md` §Frontmatter currently
+   describes — specifically, a comparison-chart template
+   covering side-by-side outputs.
+3. UC5 has no overlap with UC1 acceptance scenario (PR-creation
+   end-to-end); pulling it into v0.1 would force the
+   "pragmatic, medium-weight hybrid" goal off-balance.
+4. Architecturally, UC5 sits closer to **eval-harness** (see
+   [`research/semi-autonomous-agents-cross-reference-2026-05.md`](../research/semi-autonomous-agents-cross-reference-2026-05.md)
+   §6.7) than to agent orchestration. It will likely land
+   as its own v0.2 ADR with a runner + comparison-template
+   spec, not as an extension of the inner-loop.
+
+**Notes.**
+
+- The existing UC2 best-effort retrieval-only stays in v0.1
+  and is **not** UC5: UC2 fans out a single LLM across
+  multiple sources; UC5 fans out multiple LLMs across the
+  same source. Keep these distinct.
+- The `knowledge/research/` conventions (frontmatter v2,
+  topic field) and `knowledge/llms.txt` indexing already
+  provide the *foundation* a UC5 comparison-runner would
+  need; no v0.1 work is required to keep UC5 unblocked for
+  v0.2.
+
+**Consequence.** UC5 is explicitly listed in the deferred
+section so future sessions do not need to guess its status.
+A v0.2 ADR (`ADR-N — UC5 multi-LLM eval-harness`) will be
+drafted when v0.1 ships.
+
 ## Consequences
 
 - **Positive:** Clear scope for scaffolding (Phase S of the roadmap
