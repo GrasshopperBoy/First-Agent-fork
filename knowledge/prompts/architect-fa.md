@@ -32,7 +32,7 @@ for the full critique of v1.0 and the design principles behind v2.1, including t
 planner-stronger-than-executor reasoning and the red-team pass.
 
 [Acceptance for the prompt itself]
-- Stays under 1 200 lines (deep-dive tier).
+- File length within deep-dive tier per AGENTS.md rule #3 (<2000 lines, readability > size).
 - Self-contained: no external references required at LLM call time.
 - Field-order discipline (intent → deps → do → accept → verify) preserved exactly.
 

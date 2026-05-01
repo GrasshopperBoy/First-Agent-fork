@@ -1364,7 +1364,7 @@ NOT в этом PR:
 - 2026-04-29: cross-reference review notes published.
 - 2026-05-01: this note written; ADR-2 §Amendment (MCP forward-compat) proposed in same PR; ADR-1 §Amendment (UC5 deferred) proposed.
 
-**File length:** ~720 lines (deep-dive tier <2000, AGENTS.md
+**File length:** 1371 lines (deep-dive tier <2000, AGENTS.md
 rule #3 satisfied).
 
 **Author:** Devin session

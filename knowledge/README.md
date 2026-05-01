@@ -26,13 +26,14 @@ knowledge/
 ## Conventions
 
 - One concept per file.
-- Markdown only. **Two line-length tiers:**
-  - **Simple summaries / overviews** — keep under **~500 lines**.
-    If a summary pushes >600 lines — think of splitting it topic-wise.
-  - **Deep-dive / detailed research** — keep under **~1,200 lines**.
-    Deep reviews (multi-source critique, per-project verdicts,
-    cross-cutting analysis) often require 600–1,200 lines without losing
-    coherence. If a deep-dive is >1,300 lines — think of splitting it topic-wise.
+- Markdown only. **File-length tiers per
+  [AGENTS.md PR Checklist rule #3](../AGENTS.md#pr-checklist):**
+  - **Summaries / overviews:** 400–1000 lines.
+  - **Deep-dive research:** <2000 lines.
+  - **Readability > size.** Split topic-wise only when readability
+    suffers, not because a numeric threshold has been crossed.
+  - AGENTS.md rule #3 is the single source of truth for these
+    limits; do not maintain a separate threshold here.
 - Link to source URLs for any non-obvious claim.
 - **Never silently overwrite.** When a file is superseded: mark the old
   file with `> **Status:** superseded by <link>` at the top, add a

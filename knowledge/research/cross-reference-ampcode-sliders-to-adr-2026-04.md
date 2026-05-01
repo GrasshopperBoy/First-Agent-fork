@@ -1,6 +1,10 @@
 ---
 title: "Cross-reference review — ampcode + SLIDERS notes vs ADR-1..5 (2026-04-29)"
-compiled: "2026-04-29"
+compiled: "2026-05-01"
+# Originally compiled 2026-04-29; date bumped to 2026-05-01 when §11
+# Q-1 / Q-2 supersession blockquotes were added (citing 2026-05-01
+# events). Per AGENTS.md rule #4 `compiled:` ≥ all dates cited in text.
+# Original compile date preserved in title and in commit history.
 source:
   - knowledge/research/how-to-build-an-agent-ampcode-2026-04.md
   - knowledge/research/sliders-structured-reasoning-2026-04.md
