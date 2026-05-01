@@ -1226,39 +1226,25 @@ ev/upgrade.
 
 Multiple-choice; ответы войдут в будущие ADR / amendment'ы.
 
-- **Q-1. Inner-loop ADR (R-1) — форма:** (a) отдельный ADR-6 «inner-
-  loop + tool contract» / (b) amendment к ADR-2 §Consequences /
-  (c) сначала research-нота с альтернативами (LangGraph vs
-  ампкод), потом ADR.
-- **Q-2. Sandbox policy (R-2) — форма:** (a) отдельный ADR-7
-  «sandbox & allow-list» / (b) amendment к ADR-1 §«Concrete
-  v0.1 in-scope list» / (c) вложить в loop ADR (R-1).
+- **Q-1. Inner-loop ADR (R-1) — форма:**  отдельный ADR-6 «inner-
+  loop + tool contract».
+- **Q-2. Sandbox policy (R-2) — форма:** amendment к ADR-1 §«Concrete
+  v0.1 in-scope list».
 - **Q-3. Edit-format фикстура (R-3) — формат будущего решения:**
-  (a) string-replace OK на всех тиерах → запинить в loop ADR /
-  (b) mid-tier проседает → diff-apply primary, string-replace
-  fallback / (c) катастрофа → upgrade Coder до top-tier (меняем
-  ADR-2). Решать после фикстуры.
+  string-replace OK на всех тиерах → запинить в loop ADR.
 - **Q-4. Variant D (R-4) — где живёт:** (a) amendment к ADR-3,
-  новый раздел «Future variants» / (b) только в parent
-  research-ноте / (c) отдельная mini-ADR (status: proposed).
-- **Q-5. `chunks` schema (R-5) — когда:** (a) сейчас, до first
-  chunker PR / (b) вместе с chunker PR / (c) post-fact, с
-  миграцией.
-- **Q-6. Frontmatter `topic:` / `privacy_tier:` (R-6):** (a) да,
-  сейчас / (b) отложить до v0.2 / (c) только `topic:`,
+  новый раздел «Future variants/upgrade» .
+- **Q-5. `chunks` schema (R-5) — когда:** сейчас, до first
+  chunker PR.
+- **Q-6. Frontmatter `topic:` / `privacy_tier:` (R-6):** только `topic:`,
   `privacy_tier` premature.
-- **Q-7. ADR-2 amendment про single-loop (R-7):** (a) да,
-  amendment / (b) нет, очевидно / (c) только в glossary (R-8).
-- **Q-8. Терминология (R-8) — форма:** (a) `docs/glossary.md` /
-  (b) отдельная research-нота «Roles vs Tiers» / (c) inline в
-  каждой ADR.
-- **Q-9. Implementation vs ADR-first:** (a) сначала R-1/R-2/R-3/R-5,
-  потом Phase M / (b) параллельно: R-1+R-2 первым PR, R-5 в
-  chunker PR, R-3 фикстуры отдельно / (c) implementation-led,
-  amendments post-fact.
-- **Q-10. Кто пишет amendment-PR'ы:** (a) эта сессия после
-  ответов / (b) следующая сессия / (c) раздробить на
-  несколько PR.
+- **Q-7. ADR-2 amendment про single-loop (R-7):**  да.
+- **Q-8. Терминология (R-8) — форма:** (a) `docs/glossary.md` + inline в
+  каждой ADR кратко.
+- **Q-9. Implementation vs ADR-first:** параллельно: R-1+R-2 первым PR, R-5 в
+  chunker PR, R-3 фикстуры отдельно
+- **Q-10. Кто пишет amendment-PR'ы:** эта сессия после
+  ответов.
 
 ---
 
