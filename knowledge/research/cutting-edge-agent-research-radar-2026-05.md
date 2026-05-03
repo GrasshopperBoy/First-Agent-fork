@@ -177,7 +177,7 @@ specified before implementation.
 ### 3.1 What the sources say
 
 SWE-agent frames ACI as the tool/interface layer an agent uses to work
-with a computer environment. Its docs highlight four practical findings:
+with a computer environment. Its docs highlight five practical findings:
 
 1. run a linter when an edit command is issued and block syntactically
    invalid edits;
