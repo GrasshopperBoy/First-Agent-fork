@@ -7,8 +7,7 @@
 > is Python; target codebases the agent reads can be anything.
 >
 > This file is an index for LLM agents that want to ingest the
-> project documentation in one fetch. Convention: see
-> https://llmstxt.org/. Paths below are GitHub raw URLs against
+> project documentation in one fetch. Paths below are GitHub raw URLs against
 > the `main` branch of `GITcrassuskey-shop/First-Agent` (upstream).
 > Primary working repo is the fork
 > `GrasshopperBoy/First-Agent-fork`; both repos' `main` are kept
