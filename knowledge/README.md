@@ -35,6 +35,11 @@ knowledge/
   - AGENTS.md rule #3 is the single source of truth for these
     limits; do not maintain a separate threshold here.
 - Link to source URLs for any non-obvious claim.
+- Research notes are written for two readers at once: the project lead
+  and future LLM agents. Prefer Russian for analytical prose and
+  recommendations so the human review path stays natural; keep exact
+  protocol/API names, code, frontmatter keys, and direct quotes in the
+  original language when precision matters.
 - **Never silently overwrite.** When a file is superseded: mark the old
   file with `> **Status:** superseded by <link>` at the top, add a
   `superseded_by:` field to its frontmatter if present, and keep the old

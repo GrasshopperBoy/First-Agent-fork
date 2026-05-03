@@ -1,5 +1,5 @@
 ---
-title: "Cutting-edge agent research radar — May 2026"
+title: "Радар cutting-edge исследований по агентам — май 2026"
 source:
   - "https://modelcontextprotocol.io/specification/2025-03-26/server/tools"
   - "https://www.anthropic.com/index/building-effective-agents"
@@ -14,127 +14,132 @@ source:
   - "../adr/ADR-2-llm-tiering.md"
   - "../adr/ADR-6-tool-sandbox-allow-list.md"
 compiled: "2026-05-03"
-chain_of_custody: "Primary-source claims are quoted or paraphrased from the URLs in `source`; First-Agent mapping is derived from ADR-2, ADR-6, and existing cross-reference notes listed above."
+chain_of_custody: "Факты из первичных источников цитируются или пересказываются по URL в `source`; mapping на First-Agent выведен из ADR-2, ADR-6 и перечисленных cross-reference notes."
 claims_requiring_verification:
-  - "Provider documentation and product names evolve quickly; re-check tool, hook, eval, and memory APIs before writing an implementation ADR."
-  - "The recommendations here are a radar/backlog, not accepted architecture decisions."
+  - "Документация провайдеров и названия продуктов быстро меняются; перед implementation ADR нужно заново проверить tool, hook, eval и memory API."
+  - "Рекомендации здесь — radar/backlog, а не принятые архитектурные решения."
 superseded_by: ""
 ---
 
-# Cutting-edge agent research radar — May 2026
+# Радар cutting-edge исследований по агентам — май 2026
 
-> **Status:** research radar / backlog input. Not an ADR.
+> **Статус:** research radar / backlog input. Не ADR.
 >
-> Purpose: capture current external patterns that look relevant to
-> First-Agent v0.1/v0.2, without starting implementation or touching
-> the chunker workstream.
+> Цель: зафиксировать текущие внешние паттерны, которые выглядят
+> релевантными для First-Agent v0.1/v0.2, без старта реализации и без
+> пересечения с workstream chunker'а.
 
-## 0. Executive summary
+## 0. Краткое резюме
 
-First-Agent already made several good bets:
+First-Agent уже сделал несколько сильных ставок:
 
-- filesystem-canonical memory instead of opaque vector-first state;
-- static role routing instead of unpredictable auto-escalation;
-- MCP-shaped tool calls without taking an MCP dependency in v0.1;
-- path allow-list sandbox before any filesystem-touching Coder loop;
-- small PRs and explicit agent coordination.
+- filesystem-canonical memory вместо opaque vector-first state;
+- статический role routing вместо непредсказуемой auto-escalation;
+- MCP-shaped tool calls без зависимости от MCP в v0.1;
+- path allow-list sandbox до любого Coder loop, который трогает FS;
+- маленькие PR и явная координация агентов.
 
-The radar below updates that direction against current agent-tooling
-signals:
+Радар ниже сверяет это направление с текущими сигналами из agent
+tooling:
 
-1. **MCP/tool registry** is still the right compatibility target, but
-   v0.1 should pin only the in-process shape: stable tool names,
-   JSON Schema inputs, structured results, structured errors, and
-   audit metadata. Avoid real MCP server/process complexity until v0.2.
-2. **ACI design matters more than raw shell access.** SWE-agent-style
-   findings point toward windowed file views, search-first tools,
-   syntactic checks around edits, and explicit empty-output messages.
-3. **Hooks are the cleanest way to compose sandbox, validation, audit,
-   and future HITL.** The v0.1 shape should stay tiny:
+1. **MCP/tool registry** остаётся правильной compatibility-целью, но
+   v0.1 должен зафиксировать только in-process shape: стабильные имена
+   tools, JSON Schema inputs, structured results, structured errors и
+   audit metadata. Реальную сложность MCP server/process лучше не
+   брать до v0.2.
+2. **ACI design важнее raw shell access.** Выводы в стиле SWE-agent
+   ведут к windowed file views, search-first tools, синтаксическим
+   проверкам вокруг edits и явным сообщениям для empty output.
+3. **Hooks — самый чистый способ собрать sandbox, validation, audit и
+   будущий HITL.** Форма v0.1 должна остаться маленькой:
    `pre_tool` + `post_tool`.
-4. **Agent memory should remain filesystem-first.** Letta/MemGPT-style
-   stateful agents validate the importance of persistent state, but
-   First-Agent should not import a memory server before the Mechanical
-   Wiki baseline is working.
-5. **Eval should start from traces and tiny datasets.** Do not wait for
-   a large benchmark. Each Phase M module should emit enough trace-like
-   data to later grade tool choice, sandbox denials, and edit success.
-6. **Sandbox/tool audit is not optional.** MCP and modern agent SDK docs
-   converge on input validation, access controls, timeouts, logs, and
-   user confirmation for sensitive operations.
-7. **Multi-agent coordination is mostly workspace isolation + file
-   ownership.** Forks/worktrees are implementation details; the rule is
+4. **Agent memory должна оставаться filesystem-first.**
+   Letta/MemGPT-style stateful agents подтверждают важность persistent
+   state, но First-Agent не должен импортировать memory server до
+   работающего baseline Mechanical Wiki.
+5. **Eval надо начинать с traces и маленьких datasets.** Не нужно
+   ждать большого benchmark. Каждый Phase M module должен эмитить
+   достаточно trace-like data, чтобы позже оценивать tool choice,
+   sandbox denials и edit success.
+6. **Sandbox/tool audit не optional.** MCP и современные agent SDK docs
+   сходятся на input validation, access controls, timeouts, logs и
+   user confirmation для sensitive operations.
+7. **Multi-agent coordination — в основном workspace isolation + file
+   ownership.** Forks/worktrees — детали реализации; правило такое:
    one agent, one branch/workspace, one PR target.
 
-Recommended next PRs:
+Рекомендуемые следующие PR:
 
 1. ADR-7 prep note: inner-loop + tool contract.
 2. Glossary update: MCP, Hook, ACI, Trace, Guardrail, Handoff.
-3. Small eval-fixture note: what first 5 trace/eval cases should be.
+3. Маленькая eval-fixture note: какими должны быть первые 5
+   trace/eval cases.
 4. Optional playbook: "launch two non-overlapping First-Agent agents".
 
 ---
 
 ## 1. Radar table
 
-| Area | External signal | First-Agent fit | Action |
+| Область | Внешний сигнал | Fit для First-Agent | Действие |
 |---|---|---|---|
-| MCP/tool registry | MCP tools expose `name`, `description`, `inputSchema`; calls use `tools/call`; results can set `isError`. | Matches ADR-2 MCP-shaped convention. | Feed into ADR-7 contract. |
-| ACI | SWE-agent emphasizes custom file viewer, concise search, edit-time lint, and explicit empty-output messages. | Strong fit for UC1 and UC3 with mid-tier Coder. | Use as tool-surface constraints. |
-| Hooks | Claude Code exposes lifecycle hooks, including `PreToolUse` / `PostToolUse`, with JSON input/output and deny decisions. | Maps to ADR-6 sandbox and future audit log. | Use only `pre_tool` / `post_tool` in v0.1. |
-| Memory | Letta stores state, messages, tool calls, and editable memory blocks. | Confirms persistent state need; too heavy for v0.1. | Keep Mechanical Wiki; revisit v0.2 volatile store. |
-| Eval | OpenAI agent evals emphasize traces first, then datasets/eval runs. | Fits small Phase M modules. | Add trace schema before large eval suite. |
-| Sandbox/audit | MCP security notes require validation, access control, rate limits, output sanitization, timeouts, audit logs. | Reinforces ADR-6. | ADR-7 must include structured errors and audit rows. |
-| Multi-agent | Worktree/fork guidance says isolated workspace per agent prevents write/read/build interference. | Matches current two-fork workflow. | Keep ownership declarations before work starts. |
+| MCP/tool registry | MCP tools expose `name`, `description`, `inputSchema`; calls use `tools/call`; results can set `isError`. | Совпадает с ADR-2 MCP-shaped convention. | Подать в ADR-7 contract. |
+| ACI | SWE-agent подчёркивает custom file viewer, concise search, edit-time lint и explicit empty-output messages. | Сильный fit для UC1 и UC3 с mid-tier Coder. | Использовать как ограничения tool surface. |
+| Hooks | Claude Code exposes lifecycle hooks, включая `PreToolUse` / `PostToolUse`, с JSON input/output и deny decisions. | Mapping на ADR-6 sandbox и future audit log. | В v0.1 использовать только `pre_tool` / `post_tool`. |
+| Memory | Letta хранит state, messages, tool calls и editable memory blocks. | Подтверждает потребность в persistent state; слишком тяжело для v0.1. | Оставить Mechanical Wiki; volatile store пересмотреть в v0.2. |
+| Eval | OpenAI agent evals подчёркивают сначала traces, потом datasets/eval runs. | Подходит для маленьких Phase M modules. | Добавить trace schema до большого eval suite. |
+| Sandbox/audit | MCP security notes требуют validation, access control, rate limits, output sanitization, timeouts, audit logs. | Усиливает ADR-6. | ADR-7 должен включать structured errors и audit rows. |
+| Multi-agent | Worktree/fork guidance говорит, что isolated workspace per agent предотвращает write/read/build interference. | Совпадает с текущим two-fork workflow. | Сохранять ownership declarations до старта работы. |
 
 ---
 
 ## 2. MCP / tool registry
 
-### 2.1 What the sources say
+### 2.1 Что говорят источники
 
-The MCP tools spec defines tools as model-invoked capabilities with:
+MCP tools spec определяет tools как model-invoked capabilities с:
 
-- unique `name`;
+- уникальным `name`;
 - human-readable `description`;
-- `inputSchema` using JSON Schema;
-- `tools/list` for discovery;
-- `tools/call` for invocation;
+- `inputSchema` на JSON Schema;
+- `tools/list` для discovery;
+- `tools/call` для invocation;
 - structured result content;
-- `isError` for tool execution errors;
-- JSON-RPC protocol errors for invalid tools / invalid arguments.
+- `isError` для tool execution errors;
+- JSON-RPC protocol errors для invalid tools / invalid arguments.
 
-It also says tools are model-controlled, but applications should keep
-human-in-the-loop affordances for safety-sensitive invocations.
+Спека также говорит, что tools are model-controlled, но applications
+должны сохранять human-in-the-loop affordances для safety-sensitive
+invocations.
 
-MCP security guidance in the same spec says servers must validate tool
-inputs, implement access controls, rate-limit invocations, and sanitize
-outputs; clients should show inputs for sensitive operations, validate
-tool results, implement timeouts, and log usage for audit.
+MCP security guidance в той же спеке говорит, что servers должны
+validate tool inputs, implement access controls, rate-limit invocations
+и sanitize outputs; clients должны показывать inputs для sensitive
+operations, validate tool results, implement timeouts и log usage for
+audit.
 
-### 2.2 First-Agent mapping
+### 2.2 Mapping на First-Agent
 
-ADR-2 already made the right zero-cost move:
+ADR-2 уже сделал правильный zero-cost ход:
 
 ```text
 request:  { name: str, params: dict[str, Any] }
 response: { result: Any | None, error: { code: int, message: str } | None }
 ```
 
-The radar update is: ADR-7 should align more closely with MCP's public
-tool vocabulary:
+Обновление радара: ADR-7 должен ближе выровняться с публичным
+словарём MCP tools:
 
-- `name` — stable tool string, e.g. `repo.read`, `repo.search`;
-- `description` — short model-facing description;
+- `name` — stable tool string, например `repo.read`, `repo.search`;
+- `description` — короткое model-facing description;
 - `input_schema` — JSON Schema;
-- `annotations` — optional v0.2 field, not needed in v0.1;
+- `annotations` — optional v0.2 field, не нужен в v0.1;
 - `result.content` — text-first result payload;
-- `is_error` or `error` — one canonical error surface.
+- `is_error` или `error` — один canonical error surface.
 
-### 2.3 Recommendation
+### 2.3 Рекомендация
 
-For v0.1, avoid a real MCP dependency. Implement an in-process
-`ToolRegistry` with MCP-compatible shape:
+Для v0.1 не брать реальную MCP dependency. Реализовать in-process
+`ToolRegistry` с MCP-compatible shape:
 
 ```text
 ToolSpec
@@ -153,57 +158,60 @@ ToolResult
   summary: str
 ```
 
-ADR-7 should explicitly say:
+ADR-7 должен явно сказать:
 
-- transport is out of scope;
-- external MCP servers are out of scope;
-- internal shape is MCP-compatible to avoid redesign later.
+- transport out of scope;
+- external MCP servers out of scope;
+- internal shape MCP-compatible, чтобы избежать redesign позже.
 
-### 2.4 Open question for ADR-7
+### 2.4 Открытый вопрос для ADR-7
 
-MCP distinguishes protocol errors from tool execution errors. First-Agent
-needs one local convention:
+MCP различает protocol errors и tool execution errors. First-Agent
+нужна одна локальная конвенция:
 
 - unknown tool / schema validation failure = protocol-ish error;
 - sandbox denial / grep no match / command failed = execution error.
 
-The exact Python exception hierarchy can be small, but it should be
-specified before implementation.
+Точная Python exception hierarchy может быть маленькой, но её надо
+задать до реализации.
 
 ---
 
 ## 3. Agent-Computer Interface (ACI)
 
-### 3.1 What the sources say
+### 3.1 Что говорят источники
 
-SWE-agent frames ACI as the tool/interface layer an agent uses to work
-with a computer environment. Its docs highlight five practical findings:
+SWE-agent описывает ACI как tool/interface layer, через который agent
+работает с computer environment. В docs выделены пять практических
+выводов:
 
-1. run a linter when an edit command is issued and block syntactically
+1. запускать linter при edit command и блокировать syntactically
    invalid edits;
-2. use a purpose-built file viewer instead of raw `cat`;
-3. show small file windows, around 100 lines per turn;
-4. make repository search concise, often listing files with matches
-   instead of dumping every matching line;
-5. say explicitly when a command succeeds with empty output.
+2. использовать purpose-built file viewer вместо raw `cat`;
+3. показывать маленькие file windows, около 100 lines per turn;
+4. делать repository search concise, часто listing files with matches
+   вместо dumping every matching line;
+5. явно говорить, когда command succeeds with empty output.
 
-The key lesson is not "copy SWE-agent"; it is that LLM agents are a new
-kind of user and need interfaces shaped for their failure modes.
+Главный урок не "copy SWE-agent", а то, что LLM agents — новый тип
+пользователя, которому нужны interfaces под его failure modes.
 
-### 3.2 First-Agent mapping
+### 3.2 Mapping на First-Agent
 
-First-Agent's UC1/UC3 constraints make ACI more important than for
+Ограничения UC1/UC3 в First-Agent делают ACI важнее, чем в
 Claude-only systems:
 
-- Coder is mid-tier OSS by design;
-- full-file reads waste the context window;
-- the Mechanical Wiki chunker can provide stable windows;
-- ADR-6 treats reads as network egress when remote LLMs are used;
-- sandbox denials must be understandable enough for the model to recover.
+- Coder by design — mid-tier OSS;
+- full-file reads тратят context window;
+- Mechanical Wiki chunker может давать stable windows;
+- ADR-6 считает reads network egress, когда используются remote LLMs;
+- sandbox denials должны быть достаточно понятны, чтобы model мог
+  recover.
 
-### 3.3 Recommendation
+### 3.3 Рекомендация
 
-ADR-7 should define tools as ACI primitives, not thin shell wrappers:
+ADR-7 должен определить tools как ACI primitives, а не thin shell
+wrappers:
 
 ```text
 repo.search(pattern, path, limit) -> list[SearchHitSummary]
@@ -212,67 +220,67 @@ repo.write_patch(path, patch) -> EditResult
 repo.status() -> RepoStatus
 ```
 
-Avoid for v0.1:
+Избегать в v0.1:
 
 - unrestricted `run_command`;
-- full-file `read_file` as the default path;
-- raw `cat` / `grep` dumps as model-facing results;
-- editing commands that do not run syntax / formatting checks.
+- full-file `read_file` как default path;
+- raw `cat` / `grep` dumps как model-facing results;
+- editing commands без syntax / formatting checks.
 
-### 3.4 Open question for ADR-7
+### 3.4 Открытый вопрос для ADR-7
 
-Should `repo.read` always require a window, or allow `path`-only for
-small files?
+Должен ли `repo.read` всегда требовать window или разрешать `path`-only
+для small files?
 
-Suggested v0.1 compromise:
+Предлагаемый v0.1 compromise:
 
-- files below a small byte threshold can be returned whole;
-- larger files require `start_line` / `end_line` or chunk anchor;
-- every result includes `truncated: true | false`.
+- files ниже небольшого byte threshold можно возвращать целиком;
+- larger files требуют `start_line` / `end_line` или chunk anchor;
+- каждый result включает `truncated: true | false`.
 
 ---
 
 ## 4. Inner-loop hooks
 
-### 4.1 What the sources say
+### 4.1 Что говорят источники
 
-Claude Code's hook reference exposes lifecycle events such as
-`SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`, `PreCompact`, and
-others. Hooks receive JSON context and can return decisions. A
-`PreToolUse` hook can deny a dangerous shell command and surface a
-reason back to the agent.
+Claude Code hook reference exposes lifecycle events, включая
+`SessionStart`, `PreToolUse`, `PostToolUse`, `Stop`, `PreCompact` и
+другие. Hooks получают JSON context и могут возвращать decisions.
+`PreToolUse` hook может deny dangerous shell command и вернуть reason
+обратно agent'у.
 
-This matches the earlier First-Agent cross-reference note: hooks are
-valuable when they separate cross-cutting concerns from tool bodies.
+Это совпадает с прежней First-Agent cross-reference note: hooks ценны,
+когда отделяют cross-cutting concerns от tool bodies.
 
-### 4.2 First-Agent mapping
+### 4.2 Mapping на First-Agent
 
-ADR-6 sandbox is already a pre-tool hook conceptually:
+ADR-6 sandbox концептуально уже pre-tool hook:
 
 ```text
 ToolRequest -> sandbox check -> allow or structured error
 ```
 
-Audit logging is a post-tool hook:
+Audit logging — это post-tool hook:
 
 ```text
 ToolRequest + ToolResult + duration -> JSONL audit row
 ```
 
-HITL confirmation is a future pre-tool hook:
+HITL confirmation — будущий pre-tool hook:
 
 ```text
 dangerous write / push -> ask user -> allow or deny
 ```
 
-### 4.3 Recommendation
+### 4.3 Рекомендация
 
-v0.1 should implement only:
+v0.1 должен реализовать только:
 
 - `pre_tool(request, context) -> HookDecision`;
 - `post_tool(request, result, context) -> None`.
 
-Do not implement:
+Не реализовывать:
 
 - `pre_run`;
 - `post_run`;
@@ -281,7 +289,7 @@ Do not implement:
 - HTTP hooks;
 - plugin systems.
 
-The minimal hook chain should be ordered:
+Минимальная hook chain должна идти в таком порядке:
 
 1. schema validation;
 2. sandbox/path policy;
@@ -290,95 +298,95 @@ The minimal hook chain should be ordered:
 5. audit log;
 6. result summarization.
 
-### 4.4 Open question for ADR-7
+### 4.4 Открытый вопрос для ADR-7
 
-Should schema validation be a hook or part of the dispatcher?
+Schema validation должна быть hook или частью dispatcher?
 
-Suggested answer: dispatcher core. Hooks should receive typed/validated
-requests. That keeps hook code simple and prevents every hook from
-re-implementing JSON Schema checks.
+Предлагаемый ответ: dispatcher core. Hooks должны получать
+typed/validated requests. Так hook code остаётся простым, и каждый hook
+не пере-реализует JSON Schema checks.
 
 ---
 
 ## 5. Agent memory
 
-### 5.1 What the sources say
+### 5.1 Что говорят источники
 
-Letta's memory docs describe stateful agents where system prompts,
-memory blocks, messages, reasoning, and tool calls persist in a
-database. Important core memories are injected into context, and agents
-can modify their own memories via tools.
+Letta memory docs описывают stateful agents, где system prompts,
+memory blocks, messages, reasoning и tool calls persist in a database.
+Важные core memories inject'ятся в context, а agents могут менять свои
+memories через tools.
 
-This is close to the MemGPT idea: context window as active memory, with
-larger persistent tiers outside context.
+Это близко к идее MemGPT: context window как active memory, а larger
+persistent tiers находятся outside context.
 
-### 5.2 First-Agent mapping
+### 5.2 Mapping на First-Agent
 
-First-Agent already has the safer v0.1 baseline:
+У First-Agent уже есть более безопасный v0.1 baseline:
 
 - Markdown files are source of truth;
 - ADR-3 rejects vector/graph complexity for v0.1;
 - ADR-4 uses SQLite FTS5 for search;
-- `hot.md` / session archives are intended as audit trail;
-- future volatile-store hooks are reserved, not implemented.
+- `hot.md` / session archives задуманы как audit trail;
+- future volatile-store hooks зарезервированы, но не implemented.
 
-The radar update is: do not import a memory platform yet. The patterns
-are relevant, but the implementation would fight the filesystem-canon
-principle if adopted too early.
+Обновление радара: пока не импортировать memory platform. Паттерны
+релевантны, но ранняя implementation будет конфликтовать с принципом
+filesystem-canon.
 
-### 5.3 Recommendation
+### 5.3 Рекомендация
 
-For v0.1:
+Для v0.1:
 
 - keep memory writes explicit and reviewable;
 - write durable notes as Markdown;
 - store tool/session traces as JSONL under `~/.fa/state/`;
 - let the Mechanical Wiki index read those files later.
 
-For v0.2:
+Для v0.2:
 
-- consider "memory blocks" as frontmatter-addressable Markdown sections;
-- consider shared blocks only after multi-user scope returns;
-- consider a volatile store only for low-stakes, evictable facts.
+- рассмотреть "memory blocks" как frontmatter-addressable Markdown
+  sections;
+- рассматривать shared blocks только после возврата multi-user scope;
+- рассмотреть volatile store только для low-stakes, evictable facts.
 
-### 5.4 Open question for v0.2
+### 5.4 Открытый вопрос для v0.2
 
-Should an agent be allowed to edit its own durable memory without PR
-review?
+Можно ли agent'у редактировать свою durable memory без PR review?
 
-Suggested answer for now: no. It may propose memory edits, but durable
-project memory still lands through PR review.
+Предлагаемый ответ пока: нет. Agent может предлагать memory edits, но
+durable project memory всё ещё должна попадать через PR review.
 
 ---
 
-## 6. Eval harness and traces
+## 6. Eval harness и traces
 
-### 6.1 What the sources say
+### 6.1 Что говорят источники
 
-OpenAI's agent-evals docs recommend starting with traces while debugging
-behavior. A trace captures model calls, tool calls, guardrails, and
-handoffs for a run. Trace grading answers questions such as:
+OpenAI agent-evals docs рекомендуют начинать с traces во время
+debugging behavior. Trace captures model calls, tool calls, guardrails
+и handoffs for a run. Trace grading отвечает на вопросы вроде:
 
 - Did the agent pick the right tool?
 - Did a handoff happen when it should?
 - Did the workflow violate an instruction or safety policy?
 - Did a prompt or routing change improve end-to-end behavior?
 
-Then, when behavior is better understood, move to repeatable datasets
+Затем, когда behavior понятнее, можно переходить к repeatable datasets
 and eval runs.
 
-The OpenAI Agents SDK also treats tracing as a first-class feature,
-alongside tools, handoffs, guardrails, sessions, and MCP tool calling.
+OpenAI Agents SDK также treats tracing as a first-class feature рядом с
+tools, handoffs, guardrails, sessions и MCP tool calling.
 
-### 6.2 First-Agent mapping
+### 6.2 Mapping на First-Agent
 
-First-Agent does not need a hosted eval product to copy the useful
-shape. It needs a local trace schema early enough that Phase M modules
-can emit data before the eval suite exists.
+First-Agent не нужен hosted eval product, чтобы взять полезную форму.
+Нужна local trace schema достаточно рано, чтобы Phase M modules могли
+emit data до появления eval suite.
 
-### 6.3 Recommendation
+### 6.3 Рекомендация
 
-Define a local trace/audit row family:
+Определить local trace/audit row family:
 
 ```json
 {
@@ -394,7 +402,7 @@ Define a local trace/audit row family:
 }
 ```
 
-Then add tiny eval fixtures:
+Затем добавить tiny eval fixtures:
 
 1. tool selection: search before read on large file;
 2. sandbox: denied read returns recoverable structured error;
@@ -402,20 +410,20 @@ Then add tiny eval fixtures:
 4. chunker: markdown and code chunks preserve provenance;
 5. role routing: Coder failure does not auto-escalate to Debug.
 
-### 6.4 Open question for ADR-7
+### 6.4 Открытый вопрос для ADR-7
 
-Does trace logging belong in ADR-7 or a separate Eval ADR?
+Trace logging должен жить в ADR-7 или отдельном Eval ADR?
 
-Suggested answer: ADR-7 owns the raw event schema because it is emitted
-by the loop. A later Eval ADR owns graders/datasets.
+Предлагаемый ответ: ADR-7 owns raw event schema, потому что её emit'ит
+loop. Поздний Eval ADR owns graders/datasets.
 
 ---
 
-## 7. Sandbox and tool audit
+## 7. Sandbox и tool audit
 
-### 7.1 What the sources say
+### 7.1 Что говорят источники
 
-MCP tool security guidance says:
+MCP tool security guidance говорит:
 
 - validate all tool inputs;
 - implement access controls;
@@ -426,27 +434,27 @@ MCP tool security guidance says:
 - implement timeouts;
 - log tool usage for audit.
 
-OpenAI Agents SDK docs list guardrails, sandbox agents, human-in-the-loop
-mechanisms, and tracing as core runtime primitives.
+OpenAI Agents SDK docs listed guardrails, sandbox agents,
+human-in-the-loop mechanisms и tracing as core runtime primitives.
 
-Claude Code hooks demonstrate deterministic pre-tool blocking with a
+Claude Code hooks демонстрируют deterministic pre-tool blocking со
 structured denial reason.
 
-### 7.2 First-Agent mapping
+### 7.2 Mapping на First-Agent
 
-ADR-6 covers path access control well, but ADR-7 must connect the policy
-to the actual loop:
+ADR-6 хорошо покрывает path access control, но ADR-7 должен связать
+policy с actual loop:
 
-- where schema validation runs;
-- what a sandbox denial looks like;
-- how denials are visible to the model;
-- what gets logged;
-- whether logs include raw paths or hashes;
-- which operations require human confirmation.
+- где запускается schema validation;
+- как выглядит sandbox denial;
+- как denials видны model;
+- что логируется;
+- включают ли logs raw paths или hashes;
+- какие operations требуют human confirmation.
 
-### 7.3 Recommendation
+### 7.3 Рекомендация
 
-ADR-7 should define:
+ADR-7 должен определить:
 
 - structured `ToolError`;
 - audit JSONL path;
@@ -455,7 +463,7 @@ ADR-7 should define:
 - recoverable vs fatal errors;
 - one-shot bypass flow from ADR-6.
 
-Suggested `ToolError` shape:
+Предлагаемый `ToolError` shape:
 
 ```json
 {
@@ -466,11 +474,11 @@ Suggested `ToolError` shape:
 }
 ```
 
-### 7.4 Open question for ADR-7
+### 7.4 Открытый вопрос для ADR-7
 
-Should audit logs store raw paths?
+Должны ли audit logs хранить raw paths?
 
-Suggested v0.1 answer:
+Предлагаемый v0.1 answer:
 
 - store raw paths for allowed project files;
 - redact/omit denied sensitive-looking paths;
@@ -480,20 +488,20 @@ Suggested v0.1 answer:
 
 ## 8. Multi-agent coordination
 
-### 8.1 What the sources say
+### 8.1 Что говорят источники
 
-Git worktree guidance for parallel agents emphasizes isolated workspaces:
-multiple agents in the same directory can overwrite each other's files,
-read half-written changes, or collide on builds and ports. Worktrees give
-each agent a separate directory and branch while sharing the git object
-store.
+Git worktree guidance для parallel agents подчёркивает isolated
+workspaces: несколько agents в одной директории могут overwrite files
+друг друга, читать half-written changes или конфликтовать на builds и
+ports. Worktrees дают каждому agent отдельную директорию и branch при
+общем git object store.
 
-The same logic applies to separate forks: isolation matters more than
-the UI's fork-chain display.
+Та же логика относится к separate forks: isolation важнее, чем то, как
+UI показывает fork-chain.
 
-### 8.2 First-Agent mapping
+### 8.2 Mapping на First-Agent
 
-Current project workflow:
+Текущий project workflow:
 
 ```text
 GITcrassuskey-shop/First-Agent:main
@@ -501,7 +509,7 @@ GITcrassuskey-shop/First-Agent:main
 └─ MondayInRussian/First-Agent-fork2:<branch>
 ```
 
-The important invariants:
+Важные invariants:
 
 - each agent starts from upstream `main`;
 - each agent owns a disjoint file set;
@@ -509,9 +517,9 @@ The important invariants:
 - dependent PRs document merge order;
 - no agent merges through another agent's fork as routine workflow.
 
-### 8.3 Recommendation
+### 8.3 Рекомендация
 
-Keep this as the project-level default:
+Оставить это project-level default:
 
 1. Assign ownership before agent launch.
 2. Give each agent a standalone prompt.
@@ -520,13 +528,13 @@ Keep this as the project-level default:
 5. Use direct PRs to `GITcrassuskey-shop/First-Agent:main`.
 6. If stacked, write `Recommended merge order: PR A → PR B`.
 
-### 8.4 Open question for v0.2
+### 8.4 Открытый вопрос для v0.2
 
-Should First-Agent eventually include a "dispatcher" that launches
-parallel child agents?
+Должен ли First-Agent когда-нибудь включить "dispatcher", который
+launches parallel child agents?
 
-Suggested answer: defer. Current scope explicitly defers UC5. The useful
-part today is the human-readable coordination protocol.
+Предлагаемый ответ: defer. Current scope explicitly defers UC5.
+Полезная часть сегодня — human-readable coordination protocol.
 
 ---
 
@@ -585,9 +593,9 @@ part today is the human-readable coordination protocol.
 
 ---
 
-## 10. Explicit non-goals
+## 10. Явные non-goals
 
-This note does **not** recommend:
+Эта note **не** рекомендует:
 
 - adding a real MCP dependency in v0.1;
 - adopting OpenAI Agents SDK, Letta, Claude Code hooks, or SWE-agent
@@ -602,7 +610,7 @@ This note does **not** recommend:
 
 ## 11. Follow-up prompt for ADR-7 prep
 
-Use this after the radar PR lands:
+Использовать после merge radar PR:
 
 ```text
 Write an ADR-7 prep note for First-Agent: inner-loop + tool contract.
@@ -624,7 +632,7 @@ Output:
 
 ## 12. Bottom line
 
-The cutting-edge signal is not "use a bigger framework". It is:
+Главный cutting-edge сигнал — не "use a bigger framework". Он такой:
 
 - keep the loop simple;
 - make tools schema-first;
@@ -634,4 +642,4 @@ The cutting-edge signal is not "use a bigger framework". It is:
 - evaluate from traces;
 - isolate parallel agents by workspace and file ownership.
 
-That is strongly aligned with the existing First-Agent ADR direction.
+Это хорошо совпадает с текущим First-Agent ADR direction.

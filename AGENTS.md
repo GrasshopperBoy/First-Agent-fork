@@ -32,6 +32,11 @@ Details: [`README.md`](./README.md).
 - New docs go in the right folder:
   - Guides / references → `docs/`. Update [`docs/README.md`](./docs/README.md).
   - Project artifacts (decisions, research, prompts) → `knowledge/`.
+- Research notes are read by both humans and agents. Prefer Russian for
+  analytical prose and project recommendations, unless the project lead
+  explicitly asks otherwise. Keep protocol names, API field names, code,
+  and direct quotes in their source language when translating would
+  reduce precision.
 - Architectural decisions → ADR from [`knowledge/adr/ADR-template.md`](./knowledge/adr/ADR-template.md).
 
 ## PR Checklist
