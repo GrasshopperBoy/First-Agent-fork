@@ -14,7 +14,7 @@ source:
   - "https://github.com/openclaw/openclaw/pull/60134"
   - "https://github.com/knightafter/openClaw-web-interface"
   - "https://github.com/23ag1/ClawdOS"
-  - "https://github.com/grp06/moltbot-agent-ui"
+  - "https://github.com/grp06/openclaw-studio"
   - "https://github.com/microsoft/magentic-ui"
   - "https://www.microsoft.com/en-us/research/blog/magentic-ui-an-experimental-human-centered-web-agent/"
   - "https://arxiv.org/abs/2507.22358"
