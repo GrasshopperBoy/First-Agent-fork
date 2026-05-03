@@ -28,15 +28,15 @@ knowledge/
 - One concept per file.
 - Markdown only. **File-length tiers per
   [AGENTS.md PR Checklist rule #3](../AGENTS.md#pr-checklist):**
-  - **Summaries / overviews:** 400–1000 lines.
+  - **Summaries / overviews:** <1000 lines.
   - **Deep-dive research:** <2000 lines.
   - **Readability > size.** Split topic-wise only when readability
     suffers, not because a numeric threshold has been crossed.
   - AGENTS.md rule #3 is the single source of truth for these
     limits; do not maintain a separate threshold here.
 - Link to source URLs for any non-obvious claim.
-- Research notes are written for two readers at once: the project lead
-  and future LLM agents. Prefer Russian for analytical prose and
+- Research notes are written for two readers at once: Humans
+  and LLM agents. Prefer Russian for analytical prose and
   recommendations so the human review path stays natural; keep exact
   protocol/API names, code, frontmatter keys, and direct quotes in the
   original language when precision matters.
