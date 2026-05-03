@@ -26,7 +26,7 @@
 
 - [docs/README.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/README.md): Wiki index.
 - [docs/architecture.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/architecture.md): Three-layer agent architecture (Interface / Cognitive / Execution).
-- [docs/workflow.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/workflow.md): R-S-M lifecycle and Devin session conventions.
+- [docs/workflow.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/workflow.md): R-S-M lifecycle, Devin session conventions, and parallel-agent fork coordination.
 - [docs/prompting.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/prompting.md): T1-T5 prompt templates and anti-patterns.
 - [docs/devin-reference.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/devin-reference.md): Devin-specific reference (Knowledge notes, Skills, Playbooks).
 - [docs/glossary.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/docs/glossary.md): Project glossary.
