@@ -1,0 +1,193 @@
+# knowledge/trace/exploration_tree.yaml
+#
+# Branching exploration DAG for First-Agent decisions. One `question`
+# node per accepted ADR, with `decision` (chosen) and `dead_end`
+# (rejected) children that carry the rationale needed to NOT revisit
+# the same alternative without new evidence. See:
+#
+#   - Schema:  knowledge/README.md §`trace/` — exploration DAG.
+#   - PR rule: AGENTS.md PR Checklist rule #9.
+#   - Origin:  knowledge/research/ara-protocol-cross-reference-2026-05.md §9 R-1
+#              (ARA `/trace/` Exploration Graph applied to FA's ADR set).
+#
+# Schema (concise):
+#
+#   - id:       stable identifier. Questions are Q-N; alternatives are
+#               Q-N.A / Q-N.B / ...; follow-up decisions are Q-N.amend-YYYY-MM-DD.
+#     type:     question | decision | dead_end | pivot | experiment
+#     text:     1-line human description; details live in `evidence`.
+#     date:     ISO YYYY-MM-DD when the node was settled.
+#     closed_by:        ADR-N or research-note path that closes a `question`.
+#     evidence:         repo-relative path to the primary artefact.
+#     chosen:           true on the decision child that was accepted.
+#     reason:           on dead_ends — why rejected at decision time.
+#     lesson:           on dead_ends — under what new evidence this
+#                       branch becomes attractive again.
+#     alternatives:     nested list — encodes parent → child edges.
+#     also_depends_on:  list of node IDs — convergence / cross-question coupling.
+#
+# This file is a hand-maintained overlay; the canonical statement of
+# each decision lives in the ADR it points to. ADR text is the source
+# of truth — the DAG is a machine-traversable index of the choices.
+
+- id: Q-1
+  type: question
+  text: "Which v0.1 use cases ship end-to-end?"
+  date: 2026-04-27
+  closed_by: ADR-1
+  evidence: knowledge/adr/ADR-1-v01-use-case-scope.md
+  alternatives:
+    - id: Q-1.A
+      type: decision
+      text: "Ship UC1 + UC3 in v0.1; defer UC4; UC2 best-effort."
+      chosen: true
+      evidence: knowledge/adr/ADR-1-v01-use-case-scope.md#decision
+    - id: Q-1.B
+      type: dead_end
+      text: "Ship UC1 + UC4 in v0.1."
+      reason: "UC4 ranked below UC1+UC3 by lead; pulls Mem0-style volatile store from v0.2."
+      lesson: "Becomes viable once volatile-memory design (per-user namespacing) is independently justified — see Q-3 dead_end Q-3.B."
+    - id: Q-1.C
+      type: dead_end
+      text: "Ship all four use cases in v0.1."
+      reason: "Contradicts pragmatic medium-weight goal; sprawling scope."
+      lesson: "Only revisit when v0.1 ships and team / infra has grown past single-user."
+- id: Q-1.amend-2026-05-01
+  type: decision
+  text: "UC5 (multi-LLM eval-harness) added to v0.1 deferred list."
+  date: 2026-05-01
+  evidence: knowledge/adr/ADR-1-v01-use-case-scope.md#amendment-2026-05-01--uc5-added-to-deferred-list
+  also_depends_on:
+    - Q-1.A
+  reason: "UC5 needs multi-LLM runner + comparison-template; sits closer to eval-harness than agent orchestration."
+
+- id: Q-2
+  type: question
+  text: "How are agent roles routed across LLM tiers?"
+  date: 2026-04-27
+  closed_by: ADR-2
+  evidence: knowledge/adr/ADR-2-llm-tiering.md
+  alternatives:
+    - id: Q-2.A
+      type: dead_end
+      text: "Single-LLM, role differentiated only by prompt."
+      reason: "Loses FA's tier-mix value proposition; cannot exploit OSS / elite cost asymmetry."
+      lesson: "Acceptable only when the budget mix collapses to one tier (e.g. fully local, fully Anthropic)."
+    - id: Q-2.B
+      type: decision
+      text: "Static role routing — each role pinned to a tier in config; no auto-escalation."
+      chosen: true
+      evidence: knowledge/adr/ADR-2-llm-tiering.md#decision
+    - id: Q-2.C
+      type: dead_end
+      text: "Hybrid dynamic routing with a hard-task detector."
+      reason: "Detector reliability is its own research problem; cost becomes unpredictable."
+      lesson: "Revisit after a stuck-loop / complexity detector exists with measurable precision/recall on FA's own task corpus."
+
+- id: Q-3
+  type: question
+  text: "Which memory architecture variant for v0.1?"
+  date: 2026-04-27
+  closed_by: ADR-3
+  evidence: knowledge/research/memory-architecture-design-2026-04-26.md
+  also_depends_on:
+    - Q-1.A
+  alternatives:
+    - id: Q-3.A
+      type: decision
+      text: "Variant A — Mechanical Wiki (filesystem-canonical Markdown + grep / FTS5 BM25)."
+      chosen: true
+      evidence: knowledge/adr/ADR-3-memory-architecture-variant.md#decision
+    - id: Q-3.B
+      type: dead_end
+      text: "Variant B — Hybrid Brain (canon + Mem0 4-op volatile store)."
+      reason: "UC4 deferred (Q-1.A), so the main beneficiary of B's design is not exercised in v0.1; UPDATE/DELETE classifier needs a top-tier LLM on every memory write."
+      lesson: "Becomes attractive once UC4 (multi-user TG) returns to scope or cross-session episodic memory is measured to underperform `hot.md`."
+    - id: Q-3.C
+      type: dead_end
+      text: "Variant C — Layered KG (write-time typed-edge extraction + graph traversal)."
+      reason: "Most LoC and schema lock-in; graph cold-start empty until corpus density materialises; lead labelled overkill."
+      lesson: "Revisit only when corpus is dense enough that BM25 plateaus on multi-hop UC2 queries."
+
+- id: Q-4
+  type: question
+  text: "Which storage backend hosts the disposable v0.1 index?"
+  date: 2026-04-27
+  closed_by: ADR-4
+  evidence: knowledge/adr/ADR-4-storage-backend.md
+  also_depends_on:
+    - Q-3.A
+  alternatives:
+    - id: Q-4.A
+      type: dead_end
+      text: "In-memory BM25 (rank-bm25 / bm25s) persisted as a pickle."
+      reason: "Pickle is brittle across Python / library versions; cold-rebuild O(corpus) on cache invalidation; no transaction story for an inbox-watcher."
+      lesson: "Acceptable only if SQLite FTS5 is unavailable on a target platform — e.g. an embedded build without the `sqlite3` stdlib's FTS5 compile-flag."
+    - id: Q-4.B
+      type: decision
+      text: "SQLite FTS5 (stdlib `sqlite3`, BM25 ranking via `MATCH` + `bm25()`)."
+      chosen: true
+      evidence: knowledge/adr/ADR-4-storage-backend.md#decision
+    - id: Q-4.C
+      type: dead_end
+      text: "External services — Postgres+pgvector / Elasticsearch / OpenSearch."
+      reason: "Operational overhead inappropriate for single-workstation single-user v0.1; contradicts 'working prototype faster'."
+      lesson: "Revisit when FA grows past single-user OR when a vector layer is committed and the corpus exceeds SQLite's practical scale."
+    - id: Q-4.D
+      type: dead_end
+      text: "Files-only — no index, grep at query time."
+      reason: "Linear scan per query; no BM25 ranking; forces full match dumps into LLM context, breaking token-efficiency metric."
+      lesson: "Only viable for corpora small enough that grep latency stays sub-second AND no ranking is needed."
+
+- id: Q-5
+  type: question
+  text: "Which chunker tool covers the v0.1 language set?"
+  date: 2026-04-28
+  closed_by: ADR-5
+  evidence: knowledge/research/chunker-design.md
+  also_depends_on:
+    - Q-3.A
+  alternatives:
+    - id: Q-5.A
+      type: decision
+      text: "universal-ctags (code) + markdown-it-py (prose) via a CompositeChunker."
+      chosen: true
+      evidence: knowledge/adr/ADR-5-chunker-tool.md#decision
+    - id: Q-5.B
+      type: dead_end
+      text: "tree-sitter-language-pack — 305 grammars in one wheel, full CST."
+      reason: "~50–100 MB wheel; CHUNKER_VERSION management hard (305 grammars upgrade independently); PowerShell grammar fragmented across three upstream repos; Markdown weaker than markdown-it-py on corner cases."
+      lesson: "Becomes the right tool when intra-symbol splitting is required (e.g. for code-graph Variant C) or PowerShell grammar consolidates upstream."
+    - id: Q-5.C
+      type: dead_end
+      text: "Per-language regex (sparks-style)."
+      reason: "sparks needed >3000 lines of pure-Python `extract.py` for 6 languages — that is the floor; maintenance disproportionate to value vs ctags."
+      lesson: "Only viable when ctags and tree-sitter are both unavailable for a target language AND the language is small enough to regex by hand."
+
+- id: Q-6
+  type: question
+  text: "How is Coder filesystem access constrained?"
+  date: 2026-04-29
+  closed_by: ADR-6
+  evidence: knowledge/adr/ADR-6-tool-sandbox-allow-list.md
+  alternatives:
+    - id: Q-6.A
+      type: dead_end
+      text: "No sandbox — Coder reads/writes anything under user's home."
+      reason: "One hallucinated path away from corrupting `~/.ssh/authorized_keys`, `~/.aws/credentials`, browser profiles; violates project-overview §4 spirit."
+      lesson: "Never. Only an adversarially-isolated environment (throwaway VM) makes this safe."
+    - id: Q-6.B
+      type: decision
+      text: "Path allow-list with explicit read/write policy in `~/.fa/sandbox.toml`; default deny."
+      chosen: true
+      evidence: knowledge/adr/ADR-6-tool-sandbox-allow-list.md#decision
+    - id: Q-6.C
+      type: dead_end
+      text: "OS-level sandbox (chroot, bubblewrap, Docker, macOS sandbox-exec)."
+      reason: "Cross-platform cost high (bubblewrap=Linux, sandbox-exec=macOS+deprecated, Docker=~250 MB + breaks `gh auth`); friction defeats use; educational forks would disable it."
+      lesson: "Becomes worth the cost when v0.2 ships `run_command` — pure-policy guard cannot intercept arbitrary shell."
+    - id: Q-6.D
+      type: dead_end
+      text: "Pure prompt-level instruction ('only edit files inside FA repo')."
+      reason: "Same failure mode as Q-6.A in practice — hallucinating Coder will violate prompt; failure is silent."
+      lesson: "Useful only as a layer on top of Q-6.B, never as a replacement."

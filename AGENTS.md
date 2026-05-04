@@ -80,6 +80,22 @@ Verify before opening a PR. Each item has triggered wasted review cycles.
    start. The agent also posts §0 verbatim in chat after handover.
    This rule applies to **new** notes with `compiled: ≥ 2026-05-04`;
    older notes are exempted and not retro-fitted.
+9. **New ADR PRs add at least one node to the exploration DAG.**
+   Any PR that introduces or amends an accepted ADR MUST also add at
+   least one node to
+   [`knowledge/trace/exploration_tree.yaml`](./knowledge/trace/exploration_tree.yaml).
+   The shape: one `question` node per new ADR, one `decision` child
+   for the chosen option (with `chosen: true`), and one `dead_end`
+   child per rejected option carrying `reason:` (why rejected at
+   decision time) + `lesson:` (what new evidence would re-open the
+   branch). Amendments append a follow-up `decision` or `pivot` node
+   referencing the original question via `also_depends_on:`. Schema
+   reference: [`knowledge/README.md` §`trace/`](./knowledge/README.md#trace--exploration-dag).
+   Rationale: the DAG is the cheap-read overlay agents use to
+   understand *why* alternatives were rejected without re-reading
+   every ADR end-to-end (origin: research note
+   [`ara-protocol-cross-reference-2026-05.md`](./knowledge/research/ara-protocol-cross-reference-2026-05.md)
+   §9 R-1).
 
 ## Stacked / sequenced PRs
 

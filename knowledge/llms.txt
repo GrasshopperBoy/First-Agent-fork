@@ -47,6 +47,10 @@
 - [knowledge/adr/ADR-5-chunker-tool.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/adr/ADR-5-chunker-tool.md): Chunker tool selection for v0.1 (universal-ctags + markdown-it-py).
 - [knowledge/adr/ADR-6-tool-sandbox-allow-list.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/adr/ADR-6-tool-sandbox-allow-list.md): Tool sandbox & path allow-list policy for v0.1 (deny-by-default read+write allow-list at `~/.fa/sandbox.toml`).
 
+## Exploration DAG (`knowledge/trace/`)
+
+- [knowledge/trace/exploration_tree.yaml](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/trace/exploration_tree.yaml): Branching exploration DAG — one `question` node per ADR-1..6 with `decision` (chosen) and `dead_end` (rejected) children carrying `reason:` + `lesson:`. Schema in [`knowledge/README.md` §`trace/`](./README.md#trace--exploration-dag); origin in research note [`ara-protocol-cross-reference-2026-05.md`](./research/ara-protocol-cross-reference-2026-05.md) §9 R-1.
+
 ## Prompts (`knowledge/prompts/`)
 
 - [knowledge/prompts/README.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/prompts/README.md): Prompts library conventions and index.
