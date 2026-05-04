@@ -54,12 +54,11 @@
       lesson: "Only revisit when v0.1 ships and team / infra has grown past single-user."
 - id: Q-1.amend-2026-05-01
   type: decision
-  text: "UC5 (multi-LLM eval-harness) added to v0.1 deferred list."
+  text: "UC5 (multi-LLM eval-harness) added to v0.1 deferred list — needs multi-LLM runner + comparison-template; closer to eval-harness than orchestration."
   date: 2026-05-01
   evidence: knowledge/adr/ADR-1-v01-use-case-scope.md#amendment-2026-05-01--uc5-added-to-deferred-list
   also_depends_on:
-    - Q-1.A
-  reason: "UC5 needs multi-LLM runner + comparison-template; sits closer to eval-harness than agent orchestration."
+    - Q-1
 
 - id: Q-2
   type: question
