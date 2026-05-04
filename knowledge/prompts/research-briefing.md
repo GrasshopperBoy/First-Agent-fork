@@ -71,11 +71,15 @@ to completion before the next blocking point.
    - `## 0. Decision Briefing` (see format below). This is §0,
      immediately after frontmatter, BEFORE the TL;DR and Scope.
    - `## 1. TL;DR` — 5–7 bullet points summarising the deep-dive.
-   - `## 2. Scope, метод` — coverage / method / limits.
-   - `## 3..N. Mapping / analysis` — the actual cross-reference
-     content. Use tables where the structure repeats.
-   - `## N+1. Risks` — caveats, things that constrain the
-     recommendations.
+   - `## 2. Scope, метод` — coverage / method / limits; restate
+     `goal_lens` verbatim.
+   - `## 3. Key concepts` — source-language term definitions used
+     downstream. One-line per term.
+   - `## 4..N. Mapping / analysis` — the actual cross-reference
+     content. Use tables where the structure repeats. Subsections
+     as needed (4.1, 4.2, …).
+   - `## N+1. Risks and caveats` — caveats, unverified claims, things
+     that constrain the recommendations.
    - `## N+2. Numbered recommendations (R-1..R-K)` — the long-form
      prose for each R; the §0 Briefing references back here for
      details. R-numbering and cost-tags follow the convention in
