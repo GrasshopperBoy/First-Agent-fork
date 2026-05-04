@@ -154,8 +154,8 @@ reason.
 - File `knowledge/research/<slug>-<YYYY-MM>.md` exists.
 - Frontmatter contains `goal_lens:` capturing the user's chosen goal.
 - §0 `## 0. Decision Briefing` is the first section after the
-  frontmatter; every R-N follows the seven-field format above; a
-  6-column summary table closes §0.
+  frontmatter; every R-N follows the eight-field format above; a
+  7-column summary table closes §0.
 - For every R-N with `Verdict: UNCERTAIN-ASK`, the user has been
   asked in chat and the verdict is updated in the file before the
   PR is opened (exception: `goal_lens: archive` skips iteration).
@@ -171,7 +171,7 @@ reason.
 
 ## Example — Decision Briefing applied retroactively to ampcode/SLIDERS R-1
 
-The example below applies the seven-field Decision Briefing format to
+The example below applies the eight-field Decision Briefing format to
 R-1 from
 [`cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
 §10. That note pre-dates this workflow, so the briefing here is
