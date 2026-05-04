@@ -32,9 +32,12 @@ claims_requiring_verification:
 ### R-N — <short title>
 
 - **What:** 1–2 sentences, plain language, no jargon.
-- **Goal-lens fit:**
+- **Project-axis fit (stable across notes):**
   - (A) reduces session-start noise: YES (~X tokens saved) | NO | UNKNOWN
   - (B) helps LLM find context when needed: YES (pointer-shape) | NO | UNKNOWN
+- **Goal-lens fit (per session, dynamic):**
+  - (C) advances chosen goal_lens "<verbatim from frontmatter>": YES
+    (1-sentence reason) | PARTIAL (1-sentence caveat) | NO
 - **Cost:** cheap (<1h) | medium (1–4h) | expensive (>4h)
 - **Verdict:** TAKE | SKIP | DEFER | UNCERTAIN-ASK
 - **If UNCERTAIN-ASK:** <one question, 3–4 concrete options>
@@ -45,12 +48,16 @@ claims_requiring_verification:
 
 ### Summary
 
-| R-N | Verdict | Goal-fit (A / B) | Cost | Alternative-if-rejected | User decision needed? |
-|-----|---------|------------------|------|--------------------------|------------------------|
-| R-1 | TAKE    | YES / YES        | medium | <fallback path>        | No (TAKE)              |
-| R-2 | …       | …                | …    | …                        | …                      |
+| R-N | Verdict | Project-fit (A / B) | Goal-fit (C) | Cost | Alternative-if-rejected | User decision needed? |
+|-----|---------|---------------------|--------------|------|--------------------------|------------------------|
+| R-1 | TAKE    | YES / YES           | YES (tag)    | medium | <fallback path>        | No (TAKE)              |
+| R-2 | …       | …                   | …            | …    | …                        | …                      |
 
-<!-- Use `n/a` with a one-clause reason in any cell that does not apply. -->
+<!--
+  Goal-fit (C) cell carries Y / PARTIAL / N + a 2–3-word tag; the full
+  1-sentence reason lives in the per-R block above.
+  Use `n/a` with a one-clause reason in any cell that does not apply.
+-->
 
 ## 1. TL;DR
 

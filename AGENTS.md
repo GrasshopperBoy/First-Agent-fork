@@ -66,15 +66,20 @@ Verify before opening a PR. Each item has triggered wasted review cycles.
    [`knowledge/prompts/research-briefing.md`](./knowledge/prompts/research-briefing.md)
    MUST place a `## 0. Decision Briefing` section as the first
    section after the frontmatter (before TL;DR / Scope). Each
-   recommendation in §0 follows the seven-field format (What /
-   Goal-lens fit / Cost / Verdict / If UNCERTAIN-ASK /
-   Alternative-if-rejected / Concrete first step), and §0 closes
-   with a 6-column summary table. Frontmatter MUST include a
-   `goal_lens:` field capturing the one-sentence research goal
-   elicited at session start. The agent also posts §0 verbatim in
-   chat after handover. This rule applies to **new** notes with
-   `compiled: ≥ 2026-05-04`; older notes are exempted and not
-   retro-fitted.
+   recommendation in §0 follows the eight-field format (What /
+   Project-axis fit (A, B) / Goal-lens fit (C) / Cost / Verdict / If
+   UNCERTAIN-ASK / Alternative-if-rejected / Concrete first step).
+   Axes (A) "reduces session-start noise" and (B) "helps LLM find
+   context" are stable project-axis criteria evaluated identically
+   for every note; axis (C) "advances chosen goal_lens" is the only
+   per-session axis and references the goal_lens elicited in Stage 1.
+   §0 closes with a 7-column summary table (R-N / Verdict /
+   Project-fit / Goal-fit / Cost / Alternative-if-rejected / User
+   decision needed?). Frontmatter MUST include a `goal_lens:` field
+   capturing the one-sentence research goal elicited at session
+   start. The agent also posts §0 verbatim in chat after handover.
+   This rule applies to **new** notes with `compiled: ≥ 2026-05-04`;
+   older notes are exempted and not retro-fitted.
 
 ## Stacked / sequenced PRs
 

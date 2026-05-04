@@ -104,9 +104,12 @@ follows the note's prevailing language):
 ### R-N — <short title>
 
 - **What:** 1–2 sentences, plain language, no jargon.
-- **Goal-lens fit:**
+- **Project-axis fit (stable across notes):**
   - (A) reduces session-start noise: YES (~X tokens saved) | NO | UNKNOWN
   - (B) helps LLM find context when needed: YES (pointer-shape) | NO | UNKNOWN
+- **Goal-lens fit (per session, dynamic):**
+  - (C) advances chosen goal_lens "<verbatim from frontmatter>": YES
+    (1-sentence reason) | PARTIAL (1-sentence caveat) | NO
 - **Cost:** cheap (<1h) | medium (1–4h) | expensive (>4h)
 - **Verdict:** TAKE | SKIP | DEFER | UNCERTAIN-ASK
 - **If UNCERTAIN-ASK:** <one question, 3–4 concrete options>
@@ -116,13 +119,23 @@ follows the note's prevailing language):
   action>
 ```
 
-Closing: a 6-column summary table inside §0:
+Eight top-level fields. (A) and (B) are stable project-axis criteria
+(bootstrap-budget, pointer-shape) — they evaluate the same way for
+every note in the corpus, so notes are cross-comparable on these axes.
+(C) is per-session: it answers "does this R advance the goal_lens
+the user picked in Stage 1?" and is the only place in §0 where the
+chosen goal_lens reappears.
+
+Closing: a 7-column summary table inside §0:
 
 ```text
-| R-N | Verdict | Goal-fit (A / B) | Cost | Alternative-if-rejected | User decision needed? |
+| R-N | Verdict | Project-fit (A / B) | Goal-fit (C) | Cost | Alternative-if-rejected | User decision needed? |
 ```
 
-Use `n/a` in any cell that does not apply, with a one-clause reason.
+The Goal-fit column carries a Y / PARTIAL / N indicator plus a
+2–3-word tag; the full 1-sentence reason lives in the per-R block
+above. Use `n/a` in any cell that does not apply, with a one-clause
+reason.
 
 [Constraints]
 - Markdown only.
@@ -164,7 +177,11 @@ R-1 from
 §10. That note pre-dates this workflow, so the briefing here is
 synthetic — reconstructed from the existing prose to anchor the
 canonical shape. Use it as the structural template; do not alter the
-seven-field layout.
+eight-field layout.
+
+Assume the session's `goal_lens:` was option (b) — "Find one
+immediate-improvement implementable in next PR" — to make the (C)
+axis evaluable.
 
 ```text
 ### R-1 — New ADR "Agent inner-loop and tool contract for v0.1"
@@ -175,11 +192,15 @@ seven-field layout.
   tool-call audit-log, Ctrl-C cancellation, and `tool_protocol:
   native | prompt` negotiation in `models.yaml`. None of ADR-1..5
   specifies how Coder LLM and tools communicate.
-- **Goal-lens fit:**
+- **Project-axis fit (stable across notes):**
   - (A) reduces session-start noise: NO (this is hard scope for
     v0.1, not a memory-compression fix)
   - (B) helps LLM find context when needed: YES (single ADR replaces
     Phase-M agents inventing inner-loop shape ad-hoc)
+- **Goal-lens fit (per session, dynamic):**
+  - (C) advances chosen goal_lens "Find one immediate-improvement
+    implementable in next PR": YES (one design pass produces a
+    self-contained, mergeable ADR-7; matches the goal exactly)
 - **Cost:** medium (1–4h; one design pass, ~200–300 lines ADR + a
   reference implementation skeleton)
 - **Verdict:** TAKE
@@ -198,5 +219,5 @@ seven-field layout.
 Sample summary-table row:
 
 ```text
-| R-1 | TAKE | NO / YES | medium | Phase-M agents invent inner-loop ad-hoc; tool-call audit drifts | No (TAKE) |
+| R-1 | TAKE | NO / YES | YES (matches goal exactly) | medium | Phase-M agents invent inner-loop ad-hoc; tool-call audit drifts | No (TAKE) |
 ```
