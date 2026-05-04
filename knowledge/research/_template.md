@@ -2,7 +2,7 @@
 title: "<one-line title>"
 source:
   - "<primary URL or repo path>"
-compiled: "YYYY-MM-DD"
+compiled: "<YYYY-MM-DD>"
 chain_of_custody: |
   <where to find the primary source for specific facts; see
   knowledge/README.md §Provenance-frontmatter for the conventions>
