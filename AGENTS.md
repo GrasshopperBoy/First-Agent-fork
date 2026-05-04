@@ -81,6 +81,68 @@ Verify before opening a PR. Each item has triggered wasted review cycles.
    This rule applies to **new** notes with `compiled: ≥ 2026-05-04`;
    older notes are exempted and not retro-fitted.
 
+## PR Description Style
+
+PR descriptions are the *first reading-pass* for both human review
+and LLM agents loading repo context. They should be readable
+end-to-end (no bullet-soup), and they should be cheap to parse for
+the same agents that wrote them.
+
+**Language split:**
+
+- **Default to Russian** for analytical prose, rationale, scope
+  discussion, retro-fit notes — this matches the convention already
+  in force for research notes
+  ([`knowledge/README.md` §Conventions](./knowledge/README.md#conventions))
+  and keeps the human-review path natural.
+- **Keep in English** any *identifier* whose precision matters for
+  later grep / cross-reference: file paths, frontmatter keys
+  (`compiled:`, `goal_lens:`), AGENTS.md rule references
+  («PR Checklist rule #N»), full PR titles when referencing other
+  PRs (e.g. «PR #16 *docs: add research-briefing workflow…*»), code
+  blocks, schema examples, verdict tokens (`TAKE` / `SKIP` /
+  `DEFER` / `UNCERTAIN-ASK`).
+
+**Recommended structure:**
+
+1. **One-paragraph what+why** opening — Russian prose, what ships +
+   motivating problem. No bullets here.
+2. **Files (clickable blob-URLs)** per
+   [PR Checklist rule #6](#pr-checklist).
+3. **Design-rationale prose** for any non-obvious choice — flowing
+   paragraphs, not bullets, when explanation > 3 lines.
+4. **Scope / ordering / retro-fit** — short list (≤5 items)
+   flagging merge-order, deferrals, forward-only clauses.
+5. **Review & Testing Checklist for Human** — GitHub PR template
+   block; Russian for action items, English for technical referents.
+6. **Notes** — Russian; mention follow-up PRs and any session-
+   continuity context. AI-Session trailer is appended automatically.
+
+**Avoid:**
+
+- Long English-only bullet trees. Если list > 5 items × 2-3 lines
+  каждый — develop в прозу.
+- Duplicating the commit-message body verbatim. Reference the
+  commit SHA + summarise.
+- Self-references that won't resolve at read-time (open PR / issue
+  numbers). For cross-PR coupling, use
+  [§Stacked / sequenced PRs](#stacked--sequenced-prs).
+
+**Inline review comments / replies** follow the same language split:
+Russian prose for the response; keep the cited identifier (file
+path / line / suggestion code-block) in English. Bot threads
+respond in English when matching the bot's own language.
+
+**Canonical examples on `main`:**
+
+- [PR #16 *docs: add research-briefing workflow + §0 Decision Briefing convention*](https://github.com/GrasshopperBoy/First-Agent-fork/pull/16)
+  — workflow PR with §0 Decision Briefing example.
+- [PR #17 *docs: add knowledge/trace/exploration_tree.yaml backfilling ADR-1..6 (R-1)*](https://github.com/GrasshopperBoy/First-Agent-fork/pull/17)
+  (post-rebase) — convention-codification PR.
+
+This rule applies **forward-only** from the merge of this PR; older
+PR descriptions are not retro-translated.
+
 ## Stacked / sequenced PRs
 
 Some PRs intentionally reference files, sections, or amendments that
