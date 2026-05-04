@@ -144,9 +144,9 @@ claims_requiring_verification:
 агентов (чтобы не нужно было каждый раз читать paper заново); §3–§6 — пар-
 ный mapping Ara four layers + LRM + Compiler + Seal на текущие artefact'ы
 First-Agent; §7 — что НЕ применимо и почему; §8 — риски; §9 — пронуме-
-рованные рекомендации (R-1..R-9); §10 — открытые вопросы под решение
-лида; §11 — список файлов, использованных в этой сессии; §12 — что эта
-нота **намеренно не покрывает**.
+рованные рекомендации (R-1..R-10); §10 — открытые вопросы (Q-1..Q-11)
+под решение лида; §11 — список файлов, использованных в этой сессии;
+§12 — что эта нота **намеренно не покрывает**.
 
 ---
 
@@ -738,7 +738,7 @@ target». Совпадение конвенций — независимая val
 | Compiler «PDF accessible info missing = failure»      | Strictness требует reasoning-time LLM в chunker — ADR-5 явно отвергает.                                    |
 | Mutation benchmark Level 2 как CI gate                | Stochastic, дорого, требует full LLM-as-judge runs. Для FA — manual ad-hoc experiment, не CI gate.        |
 | `(Human+AI)² Research Network`                         | v0.2+ (UC4 multi-user). На v0.1 single-user.                                                              |
-| `\sim 500` token PAPER.md manifest per artefact       | FA — один artefact (сам проект). llms.txt уже выполняет роль; per-research-note manifest overkill.        |
+| `~500` token PAPER.md manifest per artefact            | FA — один artefact (сам проект). llms.txt уже выполняет роль; per-research-note manifest overkill.        |
 | Семь event types в LRM сейчас                         | Три (`decision` / `dead_end` / `pivot`) покрывают v0.1 случаи; остальные четыре требуют evidence layer.   |
 
 ---
@@ -784,7 +784,7 @@ target». Совпадение конвенций — независимая val
 
 ---
 
-## 9. Пронумерованные рекомендации (R-1..R-9)
+## 9. Пронумерованные рекомендации (R-1..R-10)
 
 Cost tags: **cheap** (≤ один PR, < 4 hours), **medium** (один-два PR,
 1–3 days), **expensive** (multiple PR, week+).
