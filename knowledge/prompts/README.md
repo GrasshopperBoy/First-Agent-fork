@@ -47,6 +47,7 @@ last-reviewed: YYYY-MM-DD
 |---|---|
 | [`RESOLVER.md`](./RESOLVER.md) | Intent-to-template dispatcher (T1-T5 plus role prompts). |
 | [`research-topic.md`](./research-topic.md) | Research `<topic>` and produce a structured note. |
+| [`research-briefing.md`](./research-briefing.md) | Goal-driven research briefing — paper / repo cross-reference with §0 Decision Briefing. |
 | [`architect-fa.md`](./architect-fa.md) | Architect/Planner system prompt (full). |
 | [`architect-fa-compact.md`](./architect-fa-compact.md) | Architect/Planner system prompt (compact). |
 

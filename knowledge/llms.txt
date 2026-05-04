@@ -54,9 +54,17 @@
 - [knowledge/prompts/research-topic.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/prompts/research-topic.md): T1 research-topic task prompt.
 - [knowledge/prompts/architect-fa.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/prompts/architect-fa.md): Architect / Planner system prompt (full).
 - [knowledge/prompts/architect-fa-compact.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/prompts/architect-fa-compact.md): Architect / Planner system prompt (compact).
+- [knowledge/prompts/research-briefing.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/prompts/research-briefing.md): Research-briefing workflow — goal-lens elicitation, deep-dive note with §0 Decision Briefing, chat handover. Use for cross-reference / paper-vs-architecture reviews.
 
 ## Research (`knowledge/research/`)
 
+> Convention: rows for notes produced via the research-briefing
+> workflow lead with a `[goal: <one-sentence>]` prefix so an agent
+> reading this index can filter by current task without loading the
+> note. Older rows can be migrated lazily (rule #8 in AGENTS.md is
+> forward-only).
+
+- [knowledge/research/_template.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/research/_template.md): Skeleton for new research notes — frontmatter v1+v2 + `goal_lens:` + §0 Decision Briefing pre-filled. Pair with `prompts/research-briefing.md`.
 - [knowledge/research/memory-architecture-design-2026-04-26.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/research/memory-architecture-design-2026-04-26.md): Memory architecture roadmap, three variants, open questions. Source for ADR-3.
 - [knowledge/research/agentic-memory-supplement.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/research/agentic-memory-supplement.md): Mem0 paper plus codedna / gbrain / sparks / gstack deltas.
 - [knowledge/research/ai-context-os-memm-deep-dive.md](https://raw.githubusercontent.com/GITcrassuskey-shop/First-Agent/main/knowledge/research/ai-context-os-memm-deep-dive.md): AI-Context-OS (MEMM) backend deep dive.

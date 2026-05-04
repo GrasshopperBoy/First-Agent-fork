@@ -25,6 +25,7 @@ T1 first.
 | Intent | Trigger phrases (examples) | Template | File |
 |---|---|---|---|
 | Research a topic and produce a structured note | "investigate X", "summarise the literature on Y", "compare papers on Z" | T1 | [`research-topic.md`](./research-topic.md) |
+| Cross-reference a paper / repo against current architecture and produce a goal-driven Decision Briefing | "cross-reference <paper>", "review <X> against ADR-1..N", "what does <paper> mean for our architecture", "use research-briefing", "research-briefing prompt" | T1.5 | [`research-briefing.md`](./research-briefing.md) |
 | Scaffold a new code module with tests | "scaffold module M", "create the skeleton for `src/<m>/`", "set up the package for X" | T2 | (no file yet — see [`docs/prompting.md` §T2](../../docs/prompting.md)) |
 | Compare two implementation approaches | "A vs B", "two parallel PRs for <feature>", "benchmark approach 1 against approach 2" | T3 | (no file yet — see [`docs/prompting.md` §T3](../../docs/prompting.md)) |
 | Co-develop a PRD (no code) | "draft the PRD for <feature>", "spec X before we build" | T4 | (no file yet — see [`docs/prompting.md` §T4](../../docs/prompting.md)) |

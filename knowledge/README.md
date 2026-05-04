@@ -19,8 +19,10 @@ knowledge/
 ├── prompts/                  # reusable prompts
 │   ├── README.md
 │   ├── RESOLVER.md           # intent-to-template dispatcher
-│   └── research-topic.md
-└── research/                 # (created on demand) research notes
+│   ├── research-topic.md
+│   └── research-briefing.md  # goal-driven cross-reference workflow
+└── research/                 # research notes
+    └── _template.md          # skeleton (frontmatter v1+v2 + §0 Decision Briefing)
 ```
 
 ## Conventions
@@ -94,6 +96,9 @@ mentions:             # external entities (people, projects, papers, repos, URLs
   - "OpenRouter"
   - "https://arxiv.org/abs/2504.19413"
 confidence: extracted # extracted | inferred | ambiguous
+goal_lens: |          # one-sentence research goal; mandatory for notes from
+  Reduce session-start context noise for future agents.
+                      # prompts/research-briefing.md, optional otherwise
 topic: pwsh           # corpus-grouping key for v0.2 SLIDERS-style extraction
 ---
 ```
@@ -113,6 +118,13 @@ Field semantics:
   copied verbatim from a primary source; `inferred` if synthesised by
   the author / LLM from multiple sources; `ambiguous` if the source-to-
   claim mapping is unclear and the note needs a verification pass.
+- **`goal_lens`** — one-sentence research goal elicited at the start
+  of a [`prompts/research-briefing.md`](./prompts/research-briefing.md)
+  session (Stage 1: goal-lens elicitation). **Mandatory** for notes
+  produced via that workflow; optional for older notes. Lets a future
+  agent reading [`llms.txt`](./llms.txt) filter the corpus by current
+  task without loading the note. Field stays additive — adding it to a
+  pre-existing note does not constitute a schema bump.
 - **`topic`** — corpus-grouping key. Free-form short string
   (`pwsh`, `trading`, `dotfiles`, `arxiv-rag`, …). Files that share
   a `topic` are expected to share enough structure that a v0.2
