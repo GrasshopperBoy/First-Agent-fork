@@ -7,8 +7,7 @@ purpose: >
 inputs:
   - source: research paper URL, repo path, or doc reference
   - slug: short kebab-case stem for the note (e.g. "ara-protocol-cross-reference")
-  - goal_lens: one-sentence research goal; if absent the agent MUST ask
-    before reading any source
+  - goal_lens: one-sentence research goal; if absent the agent MUST ask before reading any source
 last-reviewed: 2026-05-04
 ---
 
