@@ -96,9 +96,9 @@ mentions:             # external entities (people, projects, papers, repos, URLs
   - "OpenRouter"
   - "https://arxiv.org/abs/2504.19413"
 confidence: extracted # extracted | inferred | ambiguous
-goal_lens: |          # one-sentence research goal; mandatory for notes from
-  Reduce session-start context noise for future agents.
-                      # prompts/research-briefing.md, optional otherwise
+# goal_lens: one-sentence research goal; mandatory for notes from
+# prompts/research-briefing.md, optional otherwise.
+goal_lens: "Reduce session-start context noise for future agents."
 topic: pwsh           # corpus-grouping key for v0.2 SLIDERS-style extraction
 ---
 ```

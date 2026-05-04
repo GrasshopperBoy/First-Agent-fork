@@ -6,10 +6,10 @@ compiled: "YYYY-MM-DD"
 chain_of_custody: |
   <where to find the primary source for specific facts; see
   knowledge/README.md §Provenance-frontmatter for the conventions>
-goal_lens: |
-  <one-sentence research goal elicited at session start; required for
-  notes produced via knowledge/prompts/research-briefing.md, optional
-  otherwise. See knowledge/README.md §Frontmatter v2.>
+# goal_lens: one-sentence research goal elicited at session start;
+# required for notes produced via knowledge/prompts/research-briefing.md,
+# optional otherwise. See knowledge/README.md §Frontmatter v2.
+goal_lens: "<one-sentence research goal>"
 # v2 optional fields below — additive, leave out the ones that do not apply
 tier: stable
 links: []

@@ -156,40 +156,47 @@ Use `n/a` in any cell that does not apply, with a one-clause reason.
 - Editing existing research notes (use supersession, not overwrite).
 - Modifying ADRs based on this note (separate PRs after lead approval).
 
-## Example — Decision Briefing for R-1 (Ara-protocol cross-reference)
+## Example — Decision Briefing applied retroactively to ampcode/SLIDERS R-1
 
-The following is a fully-filled briefing entry for R-1 from
-[`ara-protocol-cross-reference-2026-05.md`](../research/ara-protocol-cross-reference-2026-05.md).
-Use it as the canonical shape; do not alter the seven-field structure.
+The example below applies the seven-field Decision Briefing format to
+R-1 from
+[`cross-reference-ampcode-sliders-to-adr-2026-04.md`](../research/cross-reference-ampcode-sliders-to-adr-2026-04.md)
+§10. That note pre-dates this workflow, so the briefing here is
+synthetic — reconstructed from the existing prose to anchor the
+canonical shape. Use it as the structural template; do not alter the
+seven-field layout.
 
 ```text
-### R-1 — Branching exploration DAG (`knowledge/trace/exploration_tree.yaml`)
+### R-1 — New ADR "Agent inner-loop and tool contract for v0.1"
 
-- **What:** Add a YAML overlay file that captures every accepted ADR's
-  decision plus the alternatives it rejected, as a typed graph
-  (decision / dead_end / pivot nodes with `lesson` and `see` fields).
-  ADR prose stays untouched; YAML is navigation-only.
+- **What:** Accept a new ADR specifying the Coder ↔ tools contract:
+  Tool-Protocol shape (name / description / input_schema / fn),
+  inner-loop pseudocode (~50 lines), pydantic input validation,
+  tool-call audit-log, Ctrl-C cancellation, and `tool_protocol:
+  native | prompt` negotiation in `models.yaml`. None of ADR-1..5
+  specifies how Coder LLM and tools communicate.
 - **Goal-lens fit:**
-  - (A) reduces session-start noise: YES (~3K tokens saved per
-    ADR-question; one ~150-line YAML replaces reading 6 ADRs to learn
-    why B/C were rejected)
-  - (B) helps LLM find context when needed: YES (pointer-shape; nodes
-    link back to specific ADR sections)
-- **Cost:** medium (1–4h; manual backfill of ADR-1..6 to avoid orphan
-  nodes from auto-conversion)
+  - (A) reduces session-start noise: NO (this is hard scope for
+    v0.1, not a memory-compression fix)
+  - (B) helps LLM find context when needed: YES (single ADR replaces
+    Phase-M agents inventing inner-loop shape ad-hoc)
+- **Cost:** medium (1–4h; one design pass, ~200–300 lines ADR + a
+  reference implementation skeleton)
 - **Verdict:** TAKE
-- **If UNCERTAIN-ASK:** n/a (TAKE chosen by lead).
-- **Alternative-if-rejected:** Keep ADR amendments as the only place
-  to record rejected alternatives; future agents continue reading
-  full ADR prose to recover branching context.
-- **Concrete first step (if TAKE):** Create
-  `knowledge/trace/exploration_tree.yaml` with one decision node per
-  ADR-1..6; add 1-line convention to `AGENTS.md` PR Checklist; open
-  PR-B in same session.
+- **If UNCERTAIN-ASK:** n/a (TAKE; v0.1 hard requirement per §10
+  R-1 Horizon).
+- **Alternative-if-rejected:** Phase-M PR "implement loop" either
+  invents its own inner-loop shape (review burden) or stalls until
+  this contract emerges; multi-PR drift in tool-call audit format
+  becomes near-certain.
+- **Concrete first step (if TAKE):** Copy
+  `knowledge/adr/ADR-template.md` to
+  `knowledge/adr/ADR-7-agent-inner-loop.md`; draft Tool-Protocol
+  section using ampcode §4 as source; open PR.
 ```
 
 Sample summary-table row:
 
 ```text
-| R-1 | TAKE | YES / YES | medium | Keep ADRs as sole record of rejected alternatives | No (TAKE) |
+| R-1 | TAKE | NO / YES | medium | Phase-M agents invent inner-loop ad-hoc; tool-call audit drifts | No (TAKE) |
 ```
