@@ -68,7 +68,7 @@ claims_requiring_verification:
   - "Сопоставление «PAPER.md ≈ knowledge/llms.txt» — структурное, не функциональное.
     PAPER.md в Ara — это per-artifact manifest, llms.txt — repo-level URL index.
     Это две роли, частично перекрывающиеся."
-  - "Все architectural recommendations §10 — input для будущих ADR (в первую
+  - "Все architectural recommendations §9 — input для будущих ADR (в первую
     очередь ADR-7 inner-loop), не сами ADR. Решения принимает project lead."
   - "Утверждения «принятие 1:1 layout Ara дорогое» и «branch DAG — cheap»
     не подкреплены измерениями LoC; опираются на контекст Phase S → M."
@@ -89,8 +89,8 @@ claims_requiring_verification:
 > репо без переключения парадигмы.
 >
 > **Эта нота не предлагает менять ADR-1..6.** Она готовит структурированный
-> input — пронумерованные рекомендации (§10) и открытые вопросы
-> (§11) под решение лида. Сами правки ADR (если они нужны) —
+> input — пронумерованные рекомендации (§9) и открытые вопросы
+> (§10) под решение лида. Сами правки ADR (если они нужны) —
 > отдельные PR после согласования.
 >
 > **Адресовано:** будущему Architect/Coder-агенту FA, реквестеру и
