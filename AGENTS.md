@@ -133,12 +133,20 @@ Russian prose for the response; keep the cited identifier (file
 path / line / suggestion code-block) in English. Bot threads
 respond in English when matching the bot's own language.
 
-**Canonical examples on `main`:**
+**Canonical examples (post-merge of this PR):**
 
-- [PR #16 *docs: add research-briefing workflow + §0 Decision Briefing convention*](https://github.com/GrasshopperBoy/First-Agent-fork/pull/16)
-  — workflow PR with §0 Decision Briefing example.
 - [PR #17 *docs: add knowledge/trace/exploration_tree.yaml backfilling ADR-1..6 (R-1)*](https://github.com/GrasshopperBoy/First-Agent-fork/pull/17)
-  (post-rebase) — convention-codification PR.
+  — DAG backfill PR; description retro-rewritten in this style as a
+  demonstration before this convention merged.
+- [PR #18 *docs(AGENTS): add §PR Description Style — Russian prose +
+  English identifiers*](https://github.com/GrasshopperBoy/First-Agent-fork/pull/18)
+  — this PR; self-demonstrating description.
+
+[PR #16 *docs: add research-briefing workflow + §0 Decision Briefing
+convention*](https://github.com/GrasshopperBoy/First-Agent-fork/pull/16)
+was the *source of inspiration* for this convention but predates it
+(its description is in the older English-bullet style); not cited as
+a canonical example.
 
 This rule applies **forward-only** from the merge of this PR; older
 PR descriptions are not retro-translated.
