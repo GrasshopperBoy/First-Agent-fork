@@ -36,9 +36,9 @@ gap in the v0.1 ADR set, and the user agreed in the
 2026-04-29 session that this ADR must land **before** any
 filesystem-touching tool is implemented.
 
-This ADR specifies the policy. The implementation lives in
-the inner-loop ADR slot (cross-reference §10 R-1, planned but
-not yet drafted) and in `src/fa/sandbox/`.
+This ADR specifies the policy. The implementation lives in the
+inner-loop contract ([ADR-7](./ADR-7-inner-loop-tool-registry-contract.md))
+and in `src/fa/sandbox/`.
 
 ## Options considered
 

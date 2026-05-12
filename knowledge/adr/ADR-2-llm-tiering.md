@@ -201,12 +201,11 @@ Critic.
 **Notes.**
 
 - The `tool_protocol` field is consumed by `src/fa/llm/router.py`
-  + the inner-loop module specified in the planned **Inner-loop
-  ADR** (cross-reference §10 R-1, not yet drafted). Until that
-  ADR lands, the implementer may stub a single `native`-only
-  inner-loop and mark `prompt-only` as `NotImplemented`; the
-  field still goes into the schema so the config never has to
-  be re-written.
+  + the inner-loop module specified in
+  [ADR-7](./ADR-7-inner-loop-tool-registry-contract.md). The
+  implementer may stub a single `native`-only inner-loop and mark
+  `prompt-only` as `NotImplemented`; the field still goes into the
+  schema so the config never has to be re-written.
 - Verified model coverage (user, Apr 2026): Qwen 3.6, Kimi 2.6,
   GLM 5.1, Claude latest, Nemotron 3 Super — all native-tool.
   Mid-tier OSS prompt-only fallbacks remain possible for
@@ -286,9 +285,8 @@ the 2026-04-29 amendment).**
    exposing internal tools as remote MCP services, etc. — all
    v0.2 work, gated by a follow-up ADR.
 
-4. **Inner-loop ADR (future ADR-7) inherits the convention.**
-   When ADR-7 lands, its tool-registry contract must use this
-   request/response shape. The ADR-7 author MAY add fields
+4. **ADR-7 inherits the convention.** ADR-7's tool-registry
+   contract uses this request/response shape. The ADR-7 author MAY add fields
    (e.g. an `id` for streaming tool-calls, a `metadata`
    block) but MUST NOT change the existing two fields
    (`name`, `params` for request; `result`, `error` for

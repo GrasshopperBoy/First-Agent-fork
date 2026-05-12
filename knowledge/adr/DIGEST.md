@@ -1,7 +1,7 @@
 # ADR Digest — one-paragraph cheat-sheet
 
 > **Purpose.** Cheat-sheet for agents and humans who need the gist of
-> all six accepted ADRs without reading ~1,400 lines of source. One
+> all accepted ADRs without reading the full source set. One
 > paragraph per ADR + bulleted amendments. **The per-ADR file is the
 > authoritative source** — this digest only paraphrases.
 >
@@ -120,6 +120,28 @@ config; path-level guard is loud, fast, stoppable; symmetric to
 **Amendments.** None.
 
 **Source:** [`ADR-6`](./ADR-6-tool-sandbox-allow-list.md).
+
+## ADR-7 — Inner-loop and tool-registry contract for v0.1 (accepted 2026-05-12)
+
+**Decision.** v0.1 uses a minimal in-process Coder loop with an
+MCP-shaped registry, not external MCP servers. Tools are Python
+callables behind `ToolSpec` entries (`name`, one-line `description`,
+JSON Schema, `permission`, `tags`, handler, `defer_loading`), disclosed
+progressively: group labels → compact descriptors → full schema on
+demand. Tool calls validate JSON Schema, run `pre_tool` hooks (ADR-6
+sandbox + `tool_groups` + deterministic checks), execute, run
+`post_tool` audit / artifact persistence, and append raw events to
+`~/.fa/state/runs/<run_id>/events.jsonl`. Repository APIs are
+windowed/bounded (`repo.search`, `repo.read`) and expose both
+`edit_file(old_string, new_string)` and `apply_patch(unified_diff)`.
+No Critic / Reflector, external MCP runtime, code-execution-over-MCP,
+or `run_command` ships in v0.1. **Rationale.** Reuses ADR-2 / ADR-6,
+keeps routine context below the 100k-token design budget, preserves raw
+traces for eval, and leaves v0.2 tool-search / MCP export config-shaped.
+
+**Amendments.** None.
+
+**Source:** [`ADR-7`](./ADR-7-inner-loop-tool-registry-contract.md).
 
 ## See also
 

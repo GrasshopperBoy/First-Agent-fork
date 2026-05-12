@@ -59,9 +59,9 @@ posts), MCP-экосистема, и Devin / Claude Code как reference-аге
 - [x] Проведено исследование по ключевым развилкам — итог в
       [`knowledge/llms.txt`](./knowledge/llms.txt) (флэт-индекс всех
       артефактов) и в [`knowledge/research/`](./knowledge/research/).
-- [x] Приняты **ADR-1..ADR-6** (см.
+- [x] Приняты **ADR-1..ADR-7** (см.
       [`knowledge/adr/README.md`](./knowledge/adr/README.md));
-      ADR-7 зарезервирован под inner-loop / tool-contract.
+      ADR-7 фиксирует inner-loop / tool-registry contract.
 - [x] Поднят тулинг (lint/types/tests/CI/pre-commit, `Makefile`).
 - [x] Зафиксирована convention для stacked / sequenced PR'ов
       ([`AGENTS.md` §Stacked / sequenced PRs](./AGENTS.md#stacked--sequenced-prs)).

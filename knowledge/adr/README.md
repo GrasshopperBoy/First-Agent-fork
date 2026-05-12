@@ -30,6 +30,7 @@ You do **not** need an ADR for routine code-level choices.
 | [4](./ADR-4-storage-backend.md) | Storage backend for v0.1 | accepted |
 | [5](./ADR-5-chunker-tool.md) | Chunker tool selection for v0.1 | accepted |
 | [6](./ADR-6-tool-sandbox-allow-list.md) | Tool sandbox & path allow-list policy for v0.1 | accepted |
+| [7](./ADR-7-inner-loop-tool-registry-contract.md) | Inner-loop and tool-registry contract for v0.1 | accepted |
 
 ## Cheat-sheet
 

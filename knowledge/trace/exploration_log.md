@@ -156,3 +156,26 @@
     repo»).** Reason: hallucinating Coder will violate prompt;
     failure is silent. Lesson: useful only as a layer on top of
     the chosen option, never as a replacement.
+
+## Q-7 — What is the v0.1 Coder inner-loop and tool-registry contract? (2026-05-12)
+
+- **Closed by:** [ADR-7](../adr/ADR-7-inner-loop-tool-registry-contract.md)
+- **Coupling:** inherits Q-2 (static role routing / no Critic),
+  Q-4 (SQLite FTS5 future tool-search reuse), and Q-6 (sandbox hooks).
+- **Chosen:** Minimal in-process MCP-shaped registry and Coder loop:
+  progressive tool disclosure, JSON Schema validation, `pre_tool` /
+  `post_tool` hooks, bounded ACI tools, dual edit formats, and raw
+  `events.jsonl` traces.
+- **Rejected:**
+  - **Full MCP server topology in v0.1.** Reason: adds process,
+    transport, auth, and deployment surface before the baseline loop.
+    Lesson: revisit when v0.2 needs tool distribution or multi-process
+    isolation; ADR-7 keeps the shape compatible.
+  - **Amp-style three-tool loop with full-file reads.** Reason:
+    whole-file payloads create context bloat on large UC1 repos and do
+    not encode windowed ACI / trace invariants. Lesson: acceptable only
+    for toy repos; production v0.1 needs bounded reads and artifacts.
+  - **Always-on Critic / verifier / multi-candidate loop.** Reason:
+    contradicts ADR-2's no-Critic v0.1 amendment and adds unmeasured
+    token overhead before UC5 eval exists. Lesson: revisit after raw
+    traces show a measurable failure mode and benchmark delta.

@@ -3,8 +3,8 @@
 > **Read this first if you are an LLM agent (Devin, Claude, ChatGPT,
 > Cursor, etc.) starting a new session on this repository.**
 >
-> **Last updated:** 2026-05-10 by Devin session
-> [`f6d329f2152544fdbb0204e78660d7d0`](https://app.devin.ai/sessions/f6d329f2152544fdbb0204e78660d7d0).
+> **Last updated:** 2026-05-12 by Devin session
+> [`1f41214431bd4c888071b6598c725710`](https://app.devin.ai/sessions/1f41214431bd4c888071b6598c725710).
 
 This file is a portable counterpart to the Devin Knowledge note
 "First-Agent — current state pointer". Both contain the same
@@ -35,14 +35,14 @@ changes the project state, update **both**.
    — what the project is, what v0.1 ships, what is non-goal.
 4. Skim the ADR index at
    [`knowledge/adr/README.md`](./knowledge/adr/README.md) — the
-   six accepted decisions that shape v0.1 (ADR-1..6).
+   accepted decisions that shape v0.1 (ADR-1..7).
 5. Check the **Current state** section below for what is in
    flight right now.
 
 You should now have everything you need. Do not crawl the repo
 manually beyond this point.
 
-## Current state (as of 2026-05-10)
+## Current state (as of 2026-05-12)
 
 - **Project stage:** **Stage 1** of the three-stage evolution
   (documentation + agent development через Devin). See
@@ -50,10 +50,11 @@ manually beyond this point.
   for the full ladder (Stage 2 — first-agent 0.1 локально + iteration
   через Devin; Stage 3 — first-agent self-improves, Devin as external
   advisor).
-- **Inner-stage milestone:** Phase S scaffolding complete; design
-  layer consolidating before first feature-module PR (Phase M).
-  `src/fa/chunker/` exists per ADR-5 scaffolding, not yet end-to-end
-  tested. No other feature module is implemented.
+- **Inner-stage milestone:** Phase S scaffolding complete; ADR-7
+  closes the inner-loop / tool-registry contract before the first
+  feature-module PR (Phase M). `src/fa/chunker/` exists per ADR-5
+  scaffolding, not yet end-to-end tested. No other feature module is
+  implemented.
 - **Working repos:** canonical
   [`GITcrassuskey-shop/First-Agent`](https://github.com/GITcrassuskey-shop/First-Agent);
   forks
@@ -91,10 +92,11 @@ manually beyond this point.
     Tool sandbox + path allow-list policy (deny-by-default,
     `~/.fa/sandbox.toml`, gitignore-style globs, audit log at
     `~/.fa/state/sandbox.jsonl`, one-shot CLI bypass).
-- **ADR slot reservation.** ADR-7 is reserved for the future
-  Inner-loop ADR (cross-reference §10 R-1, not yet drafted).
-  See `cross-reference-…-2026-04.md` §11 supersession marks
-  on Q-1 / Q-2 for history.
+  - [ADR-7](./knowledge/adr/ADR-7-inner-loop-tool-registry-contract.md) —
+    v0.1 Coder inner-loop and tool-registry contract: in-process
+    MCP-shaped dispatcher, progressive tool disclosure, JSON Schema
+    validation, `pre_tool` / `post_tool` hooks, bounded ACI tools,
+    dual edit formats, and raw `events.jsonl` traces.
 - **Scaffolding:** `pyproject.toml`, Ruff, mypy, pytest,
   pre-commit, GitHub Actions CI, `Makefile`, `markdown-it-py`,
   and system dependency documentation for `universal-ctags`
@@ -124,7 +126,7 @@ manually beyond this point.
     ADR-1..5: gaps, tensions, 10 numbered recommendations
     (R-1..R-10) and 10 open questions answered by lead in §11.
     **Q-1 / Q-2 marked superseded 2026-05-01** (ADR-6 became
-    sandbox; future inner-loop = ADR-7).
+    sandbox; inner-loop later closed by ADR-7).
 - **Research note added 2026-05-01:**
   - [`research/semi-autonomous-agents-cross-reference-2026-05.md`](./knowledge/research/semi-autonomous-agents-cross-reference-2026-05.md)
     — critical analysis of three sources on semi-autonomous LLM
@@ -133,13 +135,12 @@ manually beyond this point.
     Accept / defer / reject filtering with explicit reasoning.
     Source for ADR-2 §Amendment 2026-05-01 (MCP forward-compat)
     and ADR-1 §Amendment 2026-05-01 (UC5 deferred). Input for
-    future ADR-7 inner-loop (ACI principle, hooks primitive).
+    ADR-7 inner-loop (ACI principle, hooks primitive).
 - **Research notes added 2026-05-03:**
   - [`research/cutting-edge-agent-research-radar-2026-05.md`](./knowledge/research/cutting-edge-agent-research-radar-2026-05.md)
     — radar/backlog for First-Agent v0.1/v0.2 covering MCP/tool
     registry, ACI, hooks, memory, eval traces, sandbox/audit, and
-    multi-agent coordination. Input for ADR-7 prep and future
-    module PRs.
+    multi-agent coordination. Input for ADR-7 and future module PRs.
   - [`research/agent-ui-research-radar-v0-2-2026-05.md`](./knowledge/research/agent-ui-research-radar-v0-2-2026-05.md)
     — v0.2 UI radar covering Hermes Agent UI implementations,
     Pi surfaces/packages, OpenClaw gateway/UI forks, and
@@ -158,21 +159,7 @@ manually beyond this point.
 
 ## Next steps (intended order)
 
-1. **ADR-7 — Inner-loop + tool-registry contract** (cross-reference
-   §10 R-1, future). Should pin: tool-registry contract,
-   tool-call audit log shape, edit-format (string-replace vs
-   unified-diff), input JSON-Schema validation, **MCP-shaped
-   request/response per ADR-2 amendment 2026-05-01**, and a
-   minimal **hook pipeline** primitive (pre-tool / post-tool;
-   pre-run / post-run / on-event deferred to v0.2). Inputs:
-   - [`research/efficient-llm-agent-harness-2026-05.md`](./knowledge/research/efficient-llm-agent-harness-2026-05.md)
-     — single source-of-truth для harness research под ADR-7 prep
-     (R-1..R-9 resolved + §10 ADR-7 contract sketch).
-   - cross-reference §10 R-1 / R-3 / R-7.
-   - semi-autonomous-agents cross-reference §7.1 (R-1 input
-     summary), §7.3 (edit-format two shapes), §8.4 (large-file
-     two-stage read), §8.5 (mini-hook-system rationale).
-2. **Implementation PR — chunker.** Implement `src/fa/chunker/`
+1. **Implementation PR — chunker.** Implement `src/fa/chunker/`
    with the `Chunk` dataclass and `Chunker` Protocol from
    [ADR-5 §Decision](./knowledge/adr/ADR-5-chunker-tool.md#decision)
    (now including provenance fields per 2026-04-29 amendment).
@@ -183,22 +170,22 @@ manually beyond this point.
    project lead should provide the real `.ps1` and a
    representative Go sample before this PR is considered
    mergeable.
-3. **Chunker CLI surface.** Add `fa chunk <path>` for manual
+2. **Chunker CLI surface.** Add `fa chunk <path>` for manual
    inspection of produced chunks as part of the chunker PR.
-4. **R-3 edit-format fixture.** Run a 5-10 string-replace +
+3. **R-3 edit-format fixture.** Run a 5-10 string-replace +
    5-10 unified-diff `apply_patch` test set on each
    tool-using model from ADR-2 (Qwen 3.6, Kimi 2.6, GLM 5.1,
    Claude latest, Nemotron 3 Super). Empirically verify that
-   each model handles both edit-shapes; the result pins
-   default edit-format in ADR-7. Optional pre-ADR-7; can be
+   each model handles both edit-shapes; the result can tune
+   prompting guidance for ADR-7 implementation. Optional; can be
    parallel.
-5. **Glossary** (cross-reference §10 R-8 + semi-autonomous
+4. **Glossary** (cross-reference §10 R-8 + semi-autonomous
    note §7.8): add `MCP`, `Hook`, `ACI`,
    `Reflexion / Critic / Reflector`, `Self-evolving` terms
    to [`docs/glossary.md`](./docs/glossary.md). Optional;
    not blocking ADR-7.
-6. **v0.2 UI/control-plane pre-ADR** (optional after ADR-7 prep,
-   or before if project lead prioritizes UI): use
+5. **v0.2 UI/control-plane pre-ADR** (optional if project lead
+   prioritizes UI): use
    [`research/agent-ui-research-radar-v0-2-2026-05.md`](./knowledge/research/agent-ui-research-radar-v0-2-2026-05.md)
    to decide trace-viewer-first vs live-dashboard-first, local BFF
    shape, event schema, approval UI, and non-goals.
