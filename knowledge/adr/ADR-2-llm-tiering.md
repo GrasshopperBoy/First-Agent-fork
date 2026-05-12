@@ -320,13 +320,13 @@ the 2026-04-29 amendment).**
   shape: it intercepts the dispatcher's request, validates
   the path argument against the allow-list, and either
   forwards the request or returns an `error` response. This
-  is the same shape ADR-7 will use when it formalises
-  hooks (cross-reference R-1 input from 2026-05-01 note
-  §7.1).
+  is the same shape [ADR-7](./ADR-7-inner-loop-tool-registry-contract.md)
+  uses to formalise hooks (cross-reference R-1 input from
+  2026-05-01 note §7.1).
 
-**Consequence.** Tool registry implementation (deferred to
-ADR-7 / Phase M PR) must produce a JSON-RPC-shaped dispatcher
-even though tools are in-process Python functions in v0.1.
+**Consequence.** Tool registry implementation (ADR-7 / Phase M
+PR) must produce a JSON-RPC-shaped dispatcher even though tools
+are in-process Python functions in v0.1.
 This costs no extra code (native function-calling produces
 the right shape natively), buys zero v0.1 user-visible
 features, and keeps v0.2 MCP-server distribution as a

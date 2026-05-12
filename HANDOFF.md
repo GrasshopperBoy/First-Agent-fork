@@ -183,7 +183,7 @@ manually beyond this point.
    note §7.8): add `MCP`, `Hook`, `ACI`,
    `Reflexion / Critic / Reflector`, `Self-evolving` terms
    to [`docs/glossary.md`](./docs/glossary.md). Optional;
-   not blocking ADR-7.
+   not blocking Phase M implementation.
 5. **v0.2 UI/control-plane pre-ADR** (optional if project lead
    prioritizes UI): use
    [`research/agent-ui-research-radar-v0-2-2026-05.md`](./knowledge/research/agent-ui-research-radar-v0-2-2026-05.md)
