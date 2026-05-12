@@ -97,7 +97,8 @@ The v0.1 Coder loop is:
 6. Run `pre_tool` hooks: ADR-6 sandbox, tool-group allow-list, and any
    deterministic validation.
 7. If any `pre_tool` hook modifies `params`, re-run the same JSON
-   Schema validation before handler execution.
+   Schema validation and ADR-6 sandbox checks on the modified params
+   before handler execution.
 8. Execute the handler.
 9. Run `post_tool` hooks: normalize result / error, write audit event,
    and persist large artifacts to the filesystem.
@@ -167,9 +168,10 @@ ADR-6 path policy:
 | `workspace` | May mutate sandbox-allowed workspace / repo paths. | Requires `[write]` allow-list pass for every write target. |
 | `full` | Reserved for future privileged tools. | Not allowed in v0.1 unless a later ADR/amendment defines its sandbox. |
 
-The v0.1 default is `read` or `workspace`. `full` exists only as an
-explicit registry value so implementers cannot smuggle privileged tools
-behind an underspecified boolean.
+The v0.1 default is `read` or `workspace`. The v0.1 registry loader must
+reject `full`; it exists only as an explicit future registry value so
+implementers cannot smuggle privileged tools behind an underspecified
+boolean.
 
 ### Request / response shape
 
@@ -275,15 +277,18 @@ Before the implementation PR for this contract merges:
 
 1. `ToolSpec` loader rejects tools with missing `name`,
    `description`, `input_schema`, `permission`, `tags`, or handler.
-2. JSON Schema validation rejects malformed params before handler
+2. `ToolSpec` loader rejects `permission: full` in v0.1.
+3. JSON Schema validation rejects malformed params before handler
    execution.
-3. ADR-6 path and tool-group checks run before any filesystem I/O.
-4. Tool results with large payloads return artifact paths, not raw
+4. If a hook modifies params, JSON Schema validation and ADR-6 sandbox
+   checks re-run before handler execution.
+5. ADR-6 path and tool-group checks run before any filesystem I/O.
+6. Tool results with large payloads return artifact paths, not raw
    unbounded output.
-5. `events.jsonl` records both successful and failed tool calls.
-6. Repository reads are line-windowed or byte-bounded.
-7. Edit tools expose both single-replacement and unified-diff shapes.
-8. The implementation PR answers the minimalism-first self-audit:
+7. `events.jsonl` records both successful and failed tool calls.
+8. Repository reads are line-windowed or byte-bounded.
+9. Edit tools expose both single-replacement and unified-diff shapes.
+10. The implementation PR answers the minimalism-first self-audit:
    - What is in the agent's context window that does not need to be
      there?
    - Which tools does the agent rarely use over the latest traces?
