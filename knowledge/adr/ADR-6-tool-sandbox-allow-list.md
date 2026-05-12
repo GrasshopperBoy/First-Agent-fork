@@ -239,7 +239,7 @@ deny = [
 
 Every tool that takes a path argument is responsible for
 calling the sandbox **before** doing any I/O. [ADR-7](./ADR-7-inner-loop-tool-registry-contract.md)
-fixes the exact exception type and the surface; for now the contract is:
+runs sandbox checks as `pre_tool` hooks; the contract is:
 
 ```python
 class SandboxError(Exception):
