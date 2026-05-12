@@ -220,16 +220,19 @@ prompting guidance, but the contract supports both shapes.
 
 v0.1 defines only:
 
-- `pre_tool(event) -> allow | deny | modify_params`
+- `pre_tool(event) -> HookDecision`
 - `post_tool(event) -> ToolResult`
 
-ADR-6 sandbox checks and JSON Schema validation run before handler
-execution. If a `pre_tool` hook returns `modify_params`, the dispatcher
-must re-run the same JSON Schema validation and ADR-6 sandbox checks on
-the modified params before executing the handler. Audit normalization and
-artifact persistence run after handler execution. `pre_run`, `post_run`,
-`on_event`, human approval UI, and long-lived policy hooks are deferred
-to v0.2.
+`HookDecision` is an explicit return value, not in-place mutation:
+`{verdict: "allow" | "deny" | "modify_params", params?: {}, reason?:
+""}`. A `modify_params` verdict must include the complete replacement
+`params` object that the handler would receive. ADR-6 sandbox checks and
+JSON Schema validation run before handler execution. If a `pre_tool` hook
+returns `modify_params`, the dispatcher must re-run the same JSON Schema
+validation and ADR-6 sandbox checks on the modified params before
+executing the handler. Audit normalization and artifact persistence run
+after handler execution. `pre_run`, `post_run`, `on_event`, human
+approval UI, and long-lived policy hooks are deferred to v0.2.
 
 ### Trace separation
 
