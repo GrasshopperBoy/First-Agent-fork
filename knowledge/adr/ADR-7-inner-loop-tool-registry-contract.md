@@ -147,7 +147,7 @@ description: Read a bounded line window from an allowed path.
 input_schema: {}        # JSON Schema, loaded on demand
 output_schema: {}       # optional JSON Schema
 permission: read        # read | workspace | full (full reserved post-v0.1)
-tags: [coding]          # one or more; checked by ADR-6 tool_groups
+tags: [coding]          # one or more; used by tool-group pre_tool hook
 handler: <callable>     # deterministic Python callable, not model-visible
 defer_loading: true     # hint for future tool search / MCP export
 ```
