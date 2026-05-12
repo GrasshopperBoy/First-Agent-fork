@@ -135,10 +135,11 @@ The initial tool registry is limited to coding / repo-local operations:
 the explicit new-file path. `repo.edit_file` remains the default for
 localized replacements, and `repo.apply_patch` remains the atomic
 multi-edit path. `git.status` and `git.diff` are read tools: their
-model-visible output must be filtered through ADR-6 read policy, and
-`git.diff` must suppress hunks for denied paths. `git.commit` can land
-once commit-message trailers are implemented. `web.*`, `pdf.*`, and
-`run_command` are not in the default v0.1 Coder tool group.
+model-visible output must be derived from parsed file paths and filtered
+through ADR-6 read policy; denied paths are reported only as counts.
+`git.commit` can land once commit-message trailers are implemented.
+`web.*`, `pdf.*`, and `run_command` are not in the default v0.1 Coder
+tool group.
 
 ### ToolSpec
 
@@ -224,10 +225,11 @@ v0.1 defines only:
 
 ADR-6 sandbox checks and JSON Schema validation run before handler
 execution. If a `pre_tool` hook returns `modify_params`, the dispatcher
-must validate the modified params against the same input schema before
-executing the handler. Audit normalization and artifact persistence run
-after handler execution. `pre_run`, `post_run`, `on_event`, human
-approval UI, and long-lived policy hooks are deferred to v0.2.
+must re-run the same JSON Schema validation and ADR-6 sandbox checks on
+the modified params before executing the handler. Audit normalization and
+artifact persistence run after handler execution. `pre_run`, `post_run`,
+`on_event`, human approval UI, and long-lived policy hooks are deferred
+to v0.2.
 
 ### Trace separation
 

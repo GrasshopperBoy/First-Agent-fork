@@ -265,11 +265,10 @@ The v0.1 repo-local path-touching tool set, as specified by
 | `repo.apply_patch(unified_diff)` | `check_write` for every changed path before applying |
 
 `git.status` and `git.diff` do not take explicit path arguments, but
-their outputs are still read surfaces. `git.diff` must parse changed
-paths and suppress hunks for files that fail `check_read`, especially
-deny-list matches such as `.env` files. `git.status` must not surface
-denied path names when an implementation can identify them before
-returning model-visible output.
+their outputs are still read surfaces. They must derive model-visible
+output from parsed file paths, run `check_read` for each path, and omit
+denied path names and hunks. Denied paths may be summarized only as
+counts, such as `3 paths hidden by sandbox`.
 
 Tools that touch external services (LLM calls, `gh` CLI,
 `git push`) do **not** go through the sandbox — they have
