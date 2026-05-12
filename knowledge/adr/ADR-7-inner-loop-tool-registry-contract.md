@@ -96,11 +96,13 @@ The v0.1 Coder loop is:
    input schema.
 6. Run `pre_tool` hooks: ADR-6 sandbox, tool-group allow-list, and any
    deterministic validation.
-7. Execute the handler.
-8. Run `post_tool` hooks: normalize result / error, write audit event,
+7. If any `pre_tool` hook modifies `params`, re-run the same JSON
+   Schema validation before handler execution.
+8. Execute the handler.
+9. Run `post_tool` hooks: normalize result / error, write audit event,
    and persist large artifacts to the filesystem.
-9. Return only compact summary plus artifact paths to the model.
-10. Stop on final answer, max iterations, hard error, or user approval
+10. Return only compact summary plus artifact paths to the model.
+11. Stop on final answer, max iterations, hard error, or user approval
     gate.
 
 ### Tool disclosure tiers
@@ -139,7 +141,7 @@ name: repo.read
 description: Read a bounded line window from an allowed path.
 input_schema: {}        # JSON Schema, loaded on demand
 output_schema: {}       # optional JSON Schema
-permission: read        # read | workspace | full
+permission: read        # read | workspace | full (full reserved post-v0.1)
 tags: [coding]          # one or more; checked by ADR-6 tool_groups
 handler: <callable>     # deterministic Python callable, not model-visible
 defer_loading: true     # hint for future tool search / MCP export
@@ -148,6 +150,19 @@ defer_loading: true     # hint for future tool search / MCP export
 `name` is a stable dotted string. Renaming a public tool after
 implementation requires either a backwards-compatible alias or a new ADR
 / amendment, because traces and prompts depend on it.
+
+`permission` is the tool-level capability class, not a replacement for
+ADR-6 path policy:
+
+| Permission | Meaning | ADR-6 relation |
+|---|---|---|
+| `read` | May only read sandbox-allowed paths or return metadata. | Requires `[read]` allow-list pass for filesystem reads. |
+| `workspace` | May mutate sandbox-allowed workspace / repo paths. | Requires `[write]` allow-list pass for every write target. |
+| `full` | Reserved for future privileged tools. | Not allowed in v0.1 unless a later ADR/amendment defines its sandbox. |
+
+The v0.1 default is `read` or `workspace`. `full` exists only as an
+explicit registry value so implementers cannot smuggle privileged tools
+behind an underspecified boolean.
 
 ### Request / response shape
 
@@ -195,9 +210,11 @@ v0.1 defines only:
 - `post_tool(event) -> ToolResult`
 
 ADR-6 sandbox checks and JSON Schema validation run before handler
-execution. Audit normalization and artifact persistence run after
-handler execution. `pre_run`, `post_run`, `on_event`, human approval UI,
-and long-lived policy hooks are deferred to v0.2.
+execution. If a `pre_tool` hook returns `modify_params`, the dispatcher
+must validate the modified params against the same input schema before
+executing the handler. Audit normalization and artifact persistence run
+after handler execution. `pre_run`, `post_run`, `on_event`, human
+approval UI, and long-lived policy hooks are deferred to v0.2.
 
 ### Trace separation
 
