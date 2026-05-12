@@ -184,13 +184,15 @@ Tool results use:
 
 ```yaml
 result: {}              # compact structured payload or null
-error: null             # {code, message, retryable} or null
+error: null             # {code, message} or null
 summary: ""             # short model-facing text
 artifacts: []           # paths to raw logs, diffs, or large payloads
 ```
 
 Large outputs stay in `artifacts`; the model receives bounded summaries
-and paths. Empty output is explicit, not silent.
+and paths. Empty output is explicit, not silent. A `retryable` error
+hint is deferred until ADR-2 explicitly amends the MCP-shaped error
+schema.
 
 ### ACI and edit formats
 
