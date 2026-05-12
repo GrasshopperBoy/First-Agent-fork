@@ -121,16 +121,21 @@ BM25 or vector dependency is introduced by this ADR.
 
 The initial tool registry is limited to coding / repo-local operations:
 
+- `repo.list`
 - `repo.search`
 - `repo.read`
 - `repo.edit_file`
+- `repo.write_file`
 - `repo.apply_patch`
 - `git.status`
 - `git.diff`
 
-`git.commit` can land once commit-message trailers are implemented.
-`web.*`, `pdf.*`, and `run_command` are not in the default v0.1 Coder
-tool group.
+`repo.list` is the bounded directory-listing tool; `repo.write_file` is
+the explicit new-file path. `repo.edit_file` remains the default for
+localized replacements, and `repo.apply_patch` remains the atomic
+multi-edit path. `git.commit` can land once commit-message trailers are
+implemented. `web.*`, `pdf.*`, and `run_command` are not in the default
+v0.1 Coder tool group.
 
 ### ToolSpec
 
@@ -191,9 +196,11 @@ and paths. Empty output is explicit, not silent.
 
 Coder-facing repository tools must prefer windowed and bounded APIs:
 
+- `repo.list(path, depth?, glob?) -> bounded directory entries`
 - `repo.search(query, paths?, regex?) -> matches with line ranges`
 - `repo.read(path, start_line, end_line) -> bounded text window`
 - `repo.edit_file(path, old_string, new_string) -> single replacement`
+- `repo.write_file(path, contents) -> create a new file`
 - `repo.apply_patch(unified_diff) -> atomic multi-edit`
 
 `edit_file` is the simple default for one localized replacement.

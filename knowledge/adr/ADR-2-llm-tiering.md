@@ -236,11 +236,11 @@ The original Decision and the 2026-04-29 amendment fix the
 agent ↔ LLM contract (`tool_protocol: native | prompt-only`).
 They say nothing about the **agent ↔ tools** contract — i.e.
 how the inner-loop calls a tool function, whether locally
-in-process or eventually via an MCP server. Without an
-explicit convention, the future inner-loop ADR (cross-
-reference §10 R-1, now planned as ADR-7) might design a
-tool-shape that is **not** JSON-RPC-shaped, which would force
-re-design when v0.2 wants to expose internal tools as MCP
+in-process or eventually via an MCP server. Without the explicit
+convention now fixed by
+[ADR-7](./ADR-7-inner-loop-tool-registry-contract.md), the inner loop
+might design a tool-shape that is **not** JSON-RPC-shaped, which would
+force re-design when v0.2 wants to expose internal tools as MCP
 servers (so other MCP hosts — Claude Desktop, third-party
 agents — can use them, or so heavy tools like `mcp-runner` /
 `mcp-web` can be moved to separate processes).

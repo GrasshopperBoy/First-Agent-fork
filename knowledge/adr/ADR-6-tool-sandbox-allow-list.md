@@ -71,7 +71,7 @@ takes a path goes through a `Sandbox.check_read(path)` /
 - Pros:
   - **Loud, fast, stoppable**: a Coder hallucinated path is
     rejected at the tool call, never gets to disk, never
-    enters the LLM conversation as `read_file` content.
+    enters the LLM conversation as `repo.read` content.
   - **Config-driven, single file, diffable.** The user can
     audit and version `~/.fa/sandbox.toml`.
   - **Symmetric with PR-write allow-list** in
@@ -146,8 +146,8 @@ shape, shipped as a template by `fa init`:
 # ~/.fa/sandbox.toml — Tool sandbox & path allow-list policy.
 # See knowledge/adr/ADR-6-tool-sandbox-allow-list.md.
 
-# Read allow-list. Coder tools (read_file, list_files,
-# grep, BM25) only see paths matching one of these globs.
+# Read allow-list. Coder tools (`repo.read`, `repo.list`,
+# `repo.search`, future BM25) only see paths matching one of these globs.
 [read]
 allow = [
   "~/repos/first-agent/**",       # FA itself
@@ -170,7 +170,8 @@ deny = [
   "~/.gnupg/**",
 ]
 
-# Write allow-list. edit_file / write_file / shell tools that
+# Write allow-list. `repo.edit_file`, `repo.write_file`, `repo.apply_patch`,
+# and future shell tools that
 # take an output path use this set, NOT the read set.
 # v0.1 default is *strictly* a subset of read.allow.
 [write]
@@ -251,16 +252,17 @@ class Sandbox:
     def check_write(self, path: str | os.PathLike) -> pathlib.Path: ...
 ```
 
-The v0.1 tool set (per the inner-loop ADR draft outline,
-cross-reference §10 R-1) is exactly:
+The v0.1 repo-local path-touching tool set, as specified by
+[ADR-7](./ADR-7-inner-loop-tool-registry-contract.md), is:
 
 | Tool | Gate |
 |---|---|
-| `read_file(path)` | `check_read` |
-| `list_files(path)` | `check_read` (plus filtering: results outside allow are silently dropped) |
-| `edit_file(path, …)` | `check_write` (which implicitly also passes `check_read`, see semantic 6) |
-| `write_file(path, …)` | `check_write` |
-| `grep(pattern, path)` | `check_read` recursively |
+| `repo.read(path, …)` | `check_read` |
+| `repo.list(path, …)` | `check_read` (plus filtering: results outside allow are silently dropped) |
+| `repo.search(query, paths?, regex?)` | `check_read` recursively for every searched path |
+| `repo.edit_file(path, …)` | `check_write` (which implicitly also passes `check_read`, see semantic 6) |
+| `repo.write_file(path, …)` | `check_write` |
+| `repo.apply_patch(unified_diff)` | `check_write` for every changed path before applying |
 
 Tools that touch external services (LLM calls, `gh` CLI,
 `git push`) do **not** go through the sandbox — they have
@@ -285,8 +287,8 @@ Every `check_read` / `check_write` call appends one JSON line
 to `~/.fa/state/sandbox.jsonl`:
 
 ```json
-{"ts": "2026-04-29T12:34:56Z", "op": "read", "path": "/home/u/repos/fa/x.py", "decision": "allow", "tool": "read_file"}
-{"ts": "2026-04-29T12:35:01Z", "op": "write", "path": "/home/u/.ssh/id_rsa", "decision": "deny", "tool": "edit_file", "reason": "deny-glob: ~/.ssh/**"}
+{"ts": "2026-04-29T12:34:56Z", "op": "read", "path": "/home/u/repos/fa/x.py", "decision": "allow", "tool": "repo.read"}
+{"ts": "2026-04-29T12:35:01Z", "op": "write", "path": "/home/u/.ssh/id_rsa", "decision": "deny", "tool": "repo.edit_file", "reason": "deny-glob: ~/.ssh/**"}
 ```
 
 This is the audit trail the user reads after a session to
