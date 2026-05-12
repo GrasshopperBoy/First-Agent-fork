@@ -24,11 +24,9 @@ especially §0 R-1..R-8 and §10. Secondary inputs are:
 - `cutting-edge-agent-research-radar-2026-05.md` §0 and §1 (MCP/tool
   registry, ACI, hooks, traces, sandbox/audit).
 
-This ADR intentionally stays within v0.1:
-semi-autonomous-agents cross-reference §7.1 / §7.3 / §8.4 / §8.5 and
-the cutting-edge radar §0. This ADR intentionally stays within v0.1:
-single-agent loop, in-process Python dispatcher, no external MCP server,
-no code-execution-over-MCP, no always-on verifier loop.
+This ADR intentionally stays within v0.1: single-agent loop,
+in-process Python dispatcher, no external MCP server, no
+code-execution-over-MCP, no always-on verifier loop.
 
 ## Options considered
 
