@@ -10,9 +10,9 @@ coding-agent harness under UC1+UC3 single-user scope. **Currently in
 Stage 1** (documentation + agent development через Devin); three-stage
 project evolution is defined in
 [`knowledge/project-overview.md` §1.3](./knowledge/project-overview.md#13-three-stage-project-evolution).
-Inner-stage milestone: Phase S scaffolding complete; design layer
-consolidating before first feature-module PR (Phase M);
-`src/fa/chunker/` exists, not yet end-to-end tested.
+Inner-stage milestone: Phase S scaffolding complete; ADR-7 closes the
+inner-loop / tool-registry contract before the first feature-module PR
+(Phase M); `src/fa/chunker/` exists, not yet end-to-end tested.
 Goal-formulation in 4 pillars + minimalism-first principle:
 [`knowledge/project-overview.md` §1.1](./knowledge/project-overview.md#11-четыре-столпа-цели-project-goal--four-pillars).
 README intro: [`README.md`](./README.md).

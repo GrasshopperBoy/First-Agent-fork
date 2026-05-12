@@ -237,9 +237,8 @@ deny = [
 ### Tool wiring
 
 Every tool that takes a path argument is responsible for
-calling the sandbox **before** doing any I/O. The
-inner-loop ADR (R-1, deferred) will fix the exact exception
-type and the surface; for now the contract is:
+calling the sandbox **before** doing any I/O. [ADR-7](./ADR-7-inner-loop-tool-registry-contract.md)
+fixes the exact exception type and the surface; for now the contract is:
 
 ```python
 class SandboxError(Exception):
@@ -346,7 +345,7 @@ v0.1 (manual rotation is fine).
   - `fa init` template — ship a starter `sandbox.toml`
     pre-populated with `~/.fa/`, FA repo, and an empty
     user-repo block.
-  - **Inner-loop ADR (R-1, deferred)** wires every tool
+  - **[ADR-7](./ADR-7-inner-loop-tool-registry-contract.md)** wires every tool
     in the registry through `Sandbox.check_*` before exec.
   - `docs/glossary.md` — entry for "sandbox" / "path
     allow-list" (cross-reference §10 R-8).
