@@ -113,7 +113,7 @@ UC5 is **out of v0.1 scope** and added to the
 `Concrete v0.1 deferred list`. Rationale:
 
 1. UC5 requires a multi-LLM execution-runner that is not part
-   of any v0.1 component (the inner-loop in ADR-7-future is
+   of any v0.1 component (the inner-loop in ADR-7 is
    single-LLM-per-session by design).
 2. UC5 requires a templated research-doc structure beyond
    what `knowledge/README.md` §Frontmatter currently

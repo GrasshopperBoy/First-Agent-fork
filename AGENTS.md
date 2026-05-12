@@ -272,10 +272,12 @@ Verify before opening a PR. Each item has triggered wasted review cycles.
     before merge:
     a. **Sub-agent split** — delegate the big-context work to a
        sub-agent so the parent context stays bounded (Phase-M
-       runner; rationale tracked in `BACKLOG.md` until ADR-7 lands).
+       runner; rationale tracked in `BACKLOG.md` I-2 until a
+       child-spawn primitive lands).
     b. **Lazy-load** — load skills / tool-specs / repo chunks on
        demand instead of injecting upfront (dispatcher pattern;
-       tracked in `BACKLOG.md` until ADR-7 + ADR-8 land).
+       tracked in `BACKLOG.md` I-1 / I-3 until the tool-registry
+       module and ADR-8 skills contract land).
     c. **Step-as-function** — replace the LLM call with a
        deterministic Python function where the step does not need an
        LLM (see rule #10 question 4).

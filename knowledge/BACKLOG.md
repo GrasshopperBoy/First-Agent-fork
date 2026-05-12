@@ -26,11 +26,9 @@
   specs in every call. The Planner pre-selects the relevant 3-5
   for the current task; the tool registry shape allows lazy load
   so unused specs never enter Coder context.
-- **Blocked-on:** ADR-7 (tool registry contract — currently in
-  ADR-7 prep per
-  [`research/efficient-llm-agent-harness-2026-05.md`](./research/efficient-llm-agent-harness-2026-05.md)
-  §10 ToolSpec sketch). Without a registry, there is nothing to
-  pick from.
+- **Blocked-on:** ADR-7's accepted tool-registry contract and the
+  Phase-M `src/fa/tool_registry/` implementation. Without a loaded
+  registry, there is nothing to pick from.
 - **Unblock-trigger:** ADR-7 merges **and** `src/fa/tool_registry/`
   module lands with a `ToolSpec` dataclass plus loader.
 - **First concrete step once unblocked:** Extend
