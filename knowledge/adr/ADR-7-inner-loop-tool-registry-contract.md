@@ -16,7 +16,8 @@ which extension points exist before implementation starts.
 
 The primary input is the active harness research note
 [`efficient-llm-agent-harness-2026-05.md`](../research/efficient-llm-agent-harness-2026-05.md),
-especially §0 R-1..R-8 and §10. Secondary inputs are:
+especially its §0 Decision Briefing, body recommendations, and §10
+contract sketch. Secondary inputs are:
 
 - `semi-autonomous-agents-cross-reference-2026-05.md` §7.1 (ACI
   signatures), §7.3 (edit formats), §8.4 (two-stage reads), and §8.5

@@ -210,7 +210,7 @@ Verify before opening a PR. Each item has triggered wasted review cycles.
    [`knowledge/adr/DIGEST.md`](./knowledge/adr/DIGEST.md) — add a
    one-paragraph row for a new ADR or extend the **Amendments**
    bullet of the matching ADR's row. DIGEST.md is the agent-reading
-   cheat-sheet (one paragraph per ADR ≈ 80 lines for all six);
+   cheat-sheet (one paragraph per ADR, kept compact for cheap reads);
    stale rows defeat the purpose. **In the same PR**, also cross-
    check [`HANDOFF.md`](./HANDOFF.md) §Current state ADR list — it
    is the human-readable mirror of the ADR slate (per `HANDOFF.md`

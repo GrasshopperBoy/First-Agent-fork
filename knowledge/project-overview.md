@@ -154,10 +154,10 @@ specs и код под `src/fa/`. GitHub-репозиторий — workspace и
 long-term memory; всё, что Devin производит, фиксируется как
 filesystem-canonical Markdown + Python.
 
-**Где мы сейчас:** Phase S scaffolding complete; design layer
-consolidating before first feature-module PR (Phase M). Chunker
-(`src/fa/chunker/`) реализован, не оттестирован end-to-end. ADR-1..6
-accepted; ADR-7 (inner-loop) — следующий design-PR.
+**Где мы сейчас:** Phase S scaffolding complete; ADR-7 closes the
+inner-loop / tool-registry contract before the first feature-module PR
+(Phase M). Chunker (`src/fa/chunker/`) реализован, не оттестирован
+end-to-end. ADR-1..7 accepted.
 
 **Конец Stage 1:** работающий первый release **First-Agent 0.1**,
 ready для локального запуска под UC1 (coding+PR) + UC3 (docs-to-wiki).
