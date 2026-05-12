@@ -264,6 +264,13 @@ The v0.1 repo-local path-touching tool set, as specified by
 | `repo.write_file(path, …)` | `check_write` |
 | `repo.apply_patch(unified_diff)` | `check_write` for every changed path before applying |
 
+`git.status` and `git.diff` do not take explicit path arguments, but
+their outputs are still read surfaces. `git.diff` must parse changed
+paths and suppress hunks for files that fail `check_read`, especially
+deny-list matches such as `.env` files. `git.status` must not surface
+denied path names when an implementation can identify them before
+returning model-visible output.
+
 Tools that touch external services (LLM calls, `gh` CLI,
 `git push`) do **not** go through the sandbox — they have
 their own allow-lists (`models.yaml` for LLM endpoints,

@@ -133,9 +133,11 @@ The initial tool registry is limited to coding / repo-local operations:
 `repo.list` is the bounded directory-listing tool; `repo.write_file` is
 the explicit new-file path. `repo.edit_file` remains the default for
 localized replacements, and `repo.apply_patch` remains the atomic
-multi-edit path. `git.commit` can land once commit-message trailers are
-implemented. `web.*`, `pdf.*`, and `run_command` are not in the default
-v0.1 Coder tool group.
+multi-edit path. `git.status` and `git.diff` are read tools: their
+model-visible output must be filtered through ADR-6 read policy, and
+`git.diff` must suppress hunks for denied paths. `git.commit` can land
+once commit-message trailers are implemented. `web.*`, `pdf.*`, and
+`run_command` are not in the default v0.1 Coder tool group.
 
 ### ToolSpec
 
